@@ -27,44 +27,35 @@ class Play extends Command {
 	}
 
 	async execute(interaction: CommandInteraction) {
-		try {
-			const member = await interaction.guild?.members.fetch({
-				user: interaction.user.id,
-			});
+		interaction.deferReply({
+			ephemeral: true,
+			fetchReply: true,
+		});
 
-			if (!member?.voice.channelId) {
-				interaction.reply({
-					content:
-						"You must be in a voice channel to use this command!",
-					ephemeral: true,
-				});
-				return;
-			}
+		const member = await interaction.guild?.members.fetch({
+			user: interaction.user.id,
+		});
 
-			await interaction.deferReply({
-				ephemeral: true,
-				fetchReply: true,
-			});
-
-			VeigoAssistant.musicPlayer.play(
-				member.voice.channel!,
-				interaction.options.get("query")!.value as string,
-				{
-					textChannel: interaction.channel as GuildTextBasedChannel,
-					member: interaction.member as GuildMember,
-					message: interaction.channel?.lastMessage!,
-					metadata: {
-						editReply: interaction.editReply.bind(interaction),
-					},
-				},
-			);
-		} catch (error) {
-			console.log("sdfsafasfdas ",interaction)
+		if (!member?.voice.channelId) {
 			interaction.reply({
-				content: "Something went wrong! Please try again later.",
+				content: "You must be in a voice channel to use this command!",
 				ephemeral: true,
 			});
+			return;
 		}
+
+		VeigoAssistant.musicPlayer.play(
+			member.voice.channel!,
+			interaction.options.get("query")!.value as string,
+			{
+				textChannel: interaction.channel as GuildTextBasedChannel,
+				member: interaction.member as GuildMember,
+				message: interaction.channel?.lastMessage!,
+				metadata: {
+					editReply: interaction.editReply.bind(interaction),
+				},
+			},
+		);
 	}
 }
 

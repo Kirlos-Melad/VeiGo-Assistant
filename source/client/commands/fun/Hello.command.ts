@@ -15,9 +15,10 @@ class Hello extends Command {
 	}
 
 	public async execute(interaction: CommandInteraction) {
-		await interaction.reply(
-			`Hello ${interaction.user.username} my name is ${interaction.client.user?.username}, And i'm here to help you!`,
-		);
+		await interaction.reply({
+			content: `Hello ${interaction.user.username} my name is ${interaction.client.user?.username}, And i'm here to help you!`,
+			ephemeral: true,
+		});
 	}
 }
 
