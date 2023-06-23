@@ -1,10 +1,11 @@
 import {
 	CommandInteraction,
+	EmbedBuilder,
 	GuildMember,
 	GuildTextBasedChannel,
 } from "discord.js";
 import Command from "../../../classes/Command.js";
-import Bot from "../../Bot.js";
+import VeigoAssistant from "../../VeigoAssistant.js";
 
 class Play extends Command {
 	constructor() {
@@ -26,41 +27,44 @@ class Play extends Command {
 	}
 
 	async execute(interaction: CommandInteraction) {
-		const member = await interaction.guild?.members.fetch({
-			user: interaction.user.id,
-		});
-
-		if (!member?.voice.channelId)
-			interaction.reply({
-				content: "You must be in a voice channel to use this command!",
-				ephemeral: true,
+		try {
+			const member = await interaction.guild?.members.fetch({
+				user: interaction.user.id,
 			});
-		else {
-			interaction.deferReply({ ephemeral: true });
 
-			await Bot.instance.musicPlayer.play(
+			if (!member?.voice.channelId) {
+				interaction.reply({
+					content:
+						"You must be in a voice channel to use this command!",
+					ephemeral: true,
+				});
+				return;
+			}
+
+			await interaction.deferReply({
+				ephemeral: true,
+				fetchReply: true,
+			});
+
+			VeigoAssistant.musicPlayer.play(
 				member.voice.channel!,
 				interaction.options.get("query")!.value as string,
 				{
 					textChannel: interaction.channel as GuildTextBasedChannel,
 					member: interaction.member as GuildMember,
 					message: interaction.channel?.lastMessage!,
+					metadata: {
+						editReply: interaction.editReply.bind(interaction),
+					},
 				},
 			);
-
-			interaction.editReply({
-				content: "Playing music",
+		} catch (error) {
+			console.log("sdfsafasfdas ",interaction)
+			interaction.reply({
+				content: "Something went wrong! Please try again later.",
+				ephemeral: true,
 			});
 		}
-
-		// const embed = new EmbedBuilder();
-
-		// embed.setTitle("Playing music");
-		// embed.setDescription(`Playing music`);
-		// embed.setColor("#00ff00");
-		// embed.addFields([]);
-
-		// await interaction.reply({ embeds: [embed] });
 	}
 }
 

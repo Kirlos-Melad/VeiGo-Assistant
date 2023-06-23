@@ -2,22 +2,20 @@ import { config } from "dotenv";
 import path, { resolve } from "path";
 import __dirname from "./utilities/__dirname.js";
 import { Client } from "discord.js";
-import Bot from "./client/Bot.js";
+import VeigoAssistant from "./client/VeigoAssistant.js";
 
 config({ path: resolve(".env"), debug: true });
 
-const veigoAssistant = Bot.CreateInstance(new Client({ intents: [] }));
-
 await Promise.all([
-	veigoAssistant.LoadCommands(
+	VeigoAssistant.LoadCommands(
 		path.join(__dirname(import.meta.url), "client", "commands"),
 		true,
 	),
 
-	veigoAssistant.LoadEvents(
+	VeigoAssistant.LoadEvents(
 		path.join(__dirname(import.meta.url), "client", "events"),
 		true,
 	),
 ]);
 
-await veigoAssistant.Run();
+await VeigoAssistant.Run();
