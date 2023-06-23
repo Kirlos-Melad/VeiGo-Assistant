@@ -4,20 +4,12 @@ import {
 	REST,
 	Routes,
 	ClientEvents,
-	BitField,
-	BitFieldResolvable,
-	GatewayIntentsString,
-	EmbedBuilder,
-	CommandInteraction,
-	Message,
-	MessagePayload,
-	InteractionEditReplyOptions,
 } from "discord.js";
 import DependencyLoader from "../utilities/DependencyLoader.js";
 import BotEvent from "../classes/BotEvent.js";
 import Command from "../classes/Command.js";
 
-import { DisTube, GuildIdResolvable, Queue, Song } from "distube";
+import { DisTube, DisTubeError, GuildIdResolvable, Queue, Song } from "distube";
 import { SoundCloudPlugin } from "@distube/soundcloud";
 import { SpotifyPlugin } from "@distube/spotify";
 import MusicPlayerEvent from "../classes/MusicPlayerEvent.js";
@@ -105,7 +97,24 @@ class Bot extends Client {
 			//! Functions must be bound to the class instance or else they will not work
 			play: this.mMusicPlayer.play.bind(this.mMusicPlayer),
 			stop: this.mMusicPlayer.stop.bind(this.mMusicPlayer),
-			skip: this.mMusicPlayer.skip.bind(this.mMusicPlayer),
+			skip: async (guildId: GuildIdResolvable) => {
+				try {
+					const song = await this.mMusicPlayer.skip(guildId);
+
+					return song;
+				} catch (error) {
+					if (
+						error instanceof DisTubeError &&
+						error.code === "NO_UP_NEXT"
+					) {
+						const song =
+							this.mMusicPlayer.getQueue(guildId)!.songs[0];
+						await this.mMusicPlayer.stop(guildId);
+
+						return song;
+					} else throw error;
+				}
+			},
 			pause: this.mMusicPlayer.pause.bind(this.mMusicPlayer),
 			resume: this.mMusicPlayer.resume.bind(this.mMusicPlayer),
 			hasQueue: (guildId: GuildIdResolvable) => {

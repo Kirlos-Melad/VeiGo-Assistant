@@ -3,21 +3,28 @@ import { Events, Queue, Song } from "distube";
 import MusicPlayerEvent from "../../../classes/MusicPlayerEvent.js";
 import {
 	EmbedBuilder,
+	InteractionEditReplyOptions,
+	Message,
+	MessagePayload,
 } from "discord.js";
 
-class PlaySong extends MusicPlayerEvent<Events.PLAY_SONG> {
+class Add extends MusicPlayerEvent<Events.ADD_SONG> {
 	public listener: (queue: Queue, song: Song<unknown>) => any;
 
 	constructor() {
-		super(Events.PLAY_SONG);
+		super(Events.ADD_SONG);
 		this.listener = this.handler;
 	}
 
 	private handler(queue: Queue, song: Song<unknown>) {
 		const embed = new EmbedBuilder();
 
-		embed.setTitle("Playing song");
-		embed.setDescription(`Playing **[${song!.name}](${song!.url})**`);
+		embed.setTitle("Added song to the queue");
+		embed.setDescription(
+			`New song **[${song!.name}](${
+				song!.url
+			})** was added to the queue!`,
+		);
 		embed.setThumbnail(song!.thumbnail || null);
 		embed.setColor("#00ff00");
 		embed.addFields([]);
@@ -25,8 +32,13 @@ class PlaySong extends MusicPlayerEvent<Events.PLAY_SONG> {
 			text: `Duration: ${song!.formattedDuration}`,
 		});
 
-		queue.textChannel!.send({ embeds: [embed] });
+		const metadata = song.metadata as {
+			editReply: (
+				options: string | MessagePayload | InteractionEditReplyOptions,
+			) => Promise<Message<boolean>>;
+		};
+		metadata?.editReply({ embeds: [embed] });
 	}
 }
 
-export default new PlaySong();
+export default new Add();
