@@ -13,6 +13,7 @@ import { DisTube, DisTubeError, GuildIdResolvable, Queue, Song } from "distube";
 import { SoundCloudPlugin } from "@distube/soundcloud";
 import { SpotifyPlugin } from "@distube/spotify";
 import MusicPlayerEvent from "../classes/MusicPlayerEvent.js";
+import { RetryAsyncCallback } from "../utilities/RetryCallback.js";
 
 class Bot extends Client {
 	private mCommands: Record<string, Command>;
@@ -89,7 +90,10 @@ class Bot extends Client {
 	}
 
 	public async Run() {
-		await this.login(process.env.CLIENT_TOKEN);
+		RetryAsyncCallback(
+			3,
+			async () => await this.login(process.env.CLIENT_TOKEN),
+		);
 	}
 
 	public get musicPlayer() {

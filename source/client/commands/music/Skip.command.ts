@@ -37,13 +37,15 @@ class Skip extends Command {
 			interaction.guildId!,
 		);
 
-		const embed = new EmbedBuilder();
+		if (song) {
+			const embed = new EmbedBuilder();
 
-		embed.setTitle("Skip song");
-		embed.setDescription(`Skipped **[${song!.name}](${song!.url})**`);
-		embed.setThumbnail(song!.thumbnail || null);
+			embed.setTitle("Skip song");
+			embed.setDescription(`Skipped **[${song.name}](${song.url})**`);
+			embed.setThumbnail(song.thumbnail || null);
 
-		interaction.channel!.send({ embeds: [embed] });
+			interaction.channel!.send({ embeds: [embed] });
+		}
 	}
 }
 
