@@ -1,2 +1,2 @@
-# Discord-Bot
-Discord bot named Veigo Assistant
+# VeiGo Assistant
+Veigo Assistant is a music Discord bot
