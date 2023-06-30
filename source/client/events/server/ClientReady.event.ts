@@ -1,6 +1,7 @@
-import { Awaitable, Client, Events } from "discord.js";
+import { Client, Events } from "discord.js";
 
 import BotEvent from "../../../classes/BotEvent.js";
+import LoggerService from "../../../services/Logger.service.js";
 
 class ClientReady extends BotEvent<Events.ClientReady> {
 	constructor() {
@@ -8,7 +9,7 @@ class ClientReady extends BotEvent<Events.ClientReady> {
 	}
 
 	public listener(context: any, client: Client<boolean>) {
-		console.log(`${client.user?.username} is online!`);
+		LoggerService.information(`${client.user?.username} is online!`);
 	}
 }
 

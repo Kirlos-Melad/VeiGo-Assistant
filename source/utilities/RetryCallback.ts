@@ -7,7 +7,7 @@ async function RetryAsyncCallback(
 		return await callback(...args);
 	} catch (error) {
 		if (repeat) RetryAsyncCallback(repeat - 1, callback, ...args);
-		else console.log("Failed to run");
+		else throw error;
 	}
 }
 
@@ -20,7 +20,7 @@ function RetrySyncCallback(
 		return callback(...args);
 	} catch (error) {
 		if (repeat) RetryAsyncCallback(repeat - 1, callback, ...args);
-		else console.log("Failed to run");
+		else throw error;
 	}
 }
 

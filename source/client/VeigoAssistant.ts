@@ -1,133 +1,123 @@
-import {
-	Client,
-	GatewayIntentBits,
-	REST,
-	Routes,
-	ClientEvents,
-} from "discord.js";
-import DependencyLoader from "../utilities/DependencyLoader.js";
+import { Client, REST, Routes, ClientEvents } from "discord.js";
 import BotEvent from "../classes/BotEvent.js";
 import Command from "../classes/Command.js";
 
-import { DisTube, DisTubeError, GuildIdResolvable, Queue, Song } from "distube";
-import { SoundCloudPlugin } from "@distube/soundcloud";
-import { SpotifyPlugin } from "@distube/spotify";
-import MusicPlayerEvent from "../classes/MusicPlayerEvent.js";
 import { RetryAsyncCallback } from "../utilities/RetryCallback.js";
+import LoggerService from "../services/Logger.service.js";
+import ServerBot from "./ServerBot.js";
 
-class Bot extends Client {
+class VeigoAssistant {
+	private static mInstance: VeigoAssistant;
+
+	private mDiscordClient: Client;
 	private mCommands: Record<string, Command>;
-	private mMusicPlayer: DisTube;
+	private mServers: Record<string, ServerBot>;
 
-	constructor() {
-		super({
-			intents: [
-				GatewayIntentBits.Guilds,
-				GatewayIntentBits.GuildMembers,
-				GatewayIntentBits.GuildMessages,
-				GatewayIntentBits.MessageContent,
-				GatewayIntentBits.GuildIntegrations,
-				GatewayIntentBits.GuildVoiceStates,
-			],
-		});
-
+	private constructor(discordClient: Client) {
+		this.mDiscordClient = discordClient;
 		this.mCommands = {};
-
-		this.mMusicPlayer = new DisTube(this, {
-			searchSongs: 1,
-			searchCooldown: 30,
-			emitNewSongOnly: false,
-			plugins: [new SoundCloudPlugin(), new SpotifyPlugin()],
-		});
+		this.mServers = {};
 	}
 
-	public async LoadCommands(directory: string, recursive?: boolean) {
-		const loadedCommands = await DependencyLoader(directory, recursive);
-
-		for (const commandImports of loadedCommands) {
-			const { default: command } = commandImports;
-			if (command instanceof Command) {
-				this.mCommands[command.metadata.name] = command;
-			} else {
-				console.log(`[WARNING] A command is missing`);
-			}
+	public static Create(discordClient: Client) {
+		if (!VeigoAssistant.mInstance) {
+			VeigoAssistant.mInstance = new VeigoAssistant(discordClient);
+		} else {
+			LoggerService.warning("[WARNING] Bot has already been created");
 		}
 
-		const rest = new REST().setToken(process.env.CLIENT_TOKEN!);
-		const commandValues = Object.values(this.mCommands);
-
-		// The put method is used to fully refresh all commands in the guild with the current set
-		const data = await rest.put(
-			Routes.applicationCommands(process.env.APPLICATION_ID!),
-			{
-				body: commandValues.map((command) => {
-					return command.metadata;
-				}),
-			},
-		);
+		return VeigoAssistant.mInstance;
 	}
 
-	private async AssignEvents(event: any) {
+	public static get instance() {
+		if (!VeigoAssistant.mInstance) {
+			throw new Error("Bot has not been created yet");
+		}
+
+		return VeigoAssistant.mInstance;
+	}
+
+	/* Overloaded function */
+	AddEvent<T extends keyof ClientEvents>(event: BotEvent<T>): void;
+	// AddEvent<T extends keyof typeof GuildQueueEvent>(
+	// 	event: AudioPlayerEvent<T>,
+	// ): void;
+	AddEvent(event: any): void {
+		// Implement the method logic here
+		// You can use type guards to distinguish between BotEvent and AudioPlayerEvent
 		if (event instanceof BotEvent) {
-			this.on(event.name, (...args: ClientEvents[]) => {
+			this.mDiscordClient.on(event.name, (...args: ClientEvents[]) => {
 				event.listener({ commands: this.mCommands }, ...args);
 			});
-		} else if (event instanceof MusicPlayerEvent) {
-			this.mMusicPlayer.on(event.name, event.listener);
-		} else {
-			console.log(`[WARNING] An event is missing`);
+		}
+		// else if (event instanceof AudioPlayerEvent) {
+		// 	this.mAudioPlayer.events.on(event.name, event.listener);
+		// }
+	}
+
+	AddListeners<T extends keyof ClientEvents>(events: BotEvent<T>[]): void;
+	// AddListeners<T extends keyof typeof GuildQueueEvent>(
+	// 	events: AudioPlayerEvent<T>[],
+	// ): void;
+	AddListeners(events: any[]): void {
+		for (const event of events) {
+			this.AddEvent(event);
 		}
 	}
 
-	public async LoadEvents(directory: string, recursive?: boolean) {
-		const loadedEvents = await DependencyLoader(directory, recursive);
+	public AddCommand(command: Command) {
+		this.mCommands[command.metadata.name] = command;
+	}
 
-		for (const eventImports of loadedEvents) {
-			const { default: event } = eventImports;
-
-			this.AssignEvents(event);
+	public AddCommands(commands: Command[]) {
+		for (const command of commands) {
+			this.AddCommand(command);
 		}
+	}
+
+	public async UpdateClientCommands() {
+		const rest = new REST().setToken(process.env.CLIENT_TOKEN!);
+		const commandsMetadata = Object.values(this.mCommands).map(
+			(command) => {
+				return command.metadata;
+			},
+		);
+
+		// The put method is used to fully refresh all commands in the guild with the current set
+		await RetryAsyncCallback(3, async () => {
+			await rest.put(
+				Routes.applicationCommands(process.env.APPLICATION_ID!),
+				{
+					body: commandsMetadata,
+				},
+			);
+		});
+	}
+
+	public GetServer(serverId: string) {
+		return this.mServers[serverId];
 	}
 
 	public async Run() {
-		RetryAsyncCallback(
-			3,
-			async () => await this.login(process.env.CLIENT_TOKEN),
+		await RetryAsyncCallback(3, async () => {
+			await Promise.all([
+				//this.mAudioPlayer.extractors.register(YouTubeExtractor, {}),
+				this.mDiscordClient.login(process.env.CLIENT_TOKEN),
+			]);
+		});
+
+		this.mDiscordClient.guilds.cache.forEach((guild) => {
+			this.mServers[guild.id] = new ServerBot(
+				guild.id,
+				guild.voiceAdapterCreator,
+			);
+		});
+
+		console.clear();
+		LoggerService.information(
+			`${this.mDiscordClient.user?.username} is online!`,
 		);
-	}
-
-	public get musicPlayer() {
-		return {
-			//! Functions must be bound to the class instance or else they will not work
-			play: this.mMusicPlayer.play.bind(this.mMusicPlayer),
-			stop: this.mMusicPlayer.stop.bind(this.mMusicPlayer),
-			skip: async (guildId: GuildIdResolvable) => {
-				try {
-					const song = await this.mMusicPlayer.skip(guildId);
-
-					return song;
-				} catch (error) {
-					if (
-						error instanceof DisTubeError &&
-						error.code === "NO_UP_NEXT"
-					) {
-						const song =
-							this.mMusicPlayer.getQueue(guildId)!.songs[0];
-						await this.mMusicPlayer.stop(guildId);
-
-						return song;
-					} else throw error;
-				}
-			},
-			pause: this.mMusicPlayer.pause.bind(this.mMusicPlayer),
-			resume: this.mMusicPlayer.resume.bind(this.mMusicPlayer),
-			hasQueue: (guildId: GuildIdResolvable) => {
-				return this.mMusicPlayer.getQueue(guildId) != undefined;
-			},
-			//AddToQueue: this.mMusicPlayer.addToQueue.bind(this.mMusicPlayer),
-			search: this.mMusicPlayer.search.bind(this.mMusicPlayer),
-		};
 	}
 }
 
-export default new Bot();
+export default VeigoAssistant;

@@ -1,9 +1,4 @@
-import {
-	CommandInteraction,
-	EmbedBuilder,
-	GuildMember,
-	GuildTextBasedChannel,
-} from "discord.js";
+import { CommandInteraction } from "discord.js";
 import Command from "../../../classes/Command.js";
 import VeigoAssistant from "../../VeigoAssistant.js";
 
@@ -44,17 +39,10 @@ class Play extends Command {
 			return;
 		}
 
-		VeigoAssistant.musicPlayer.play(
-			member.voice.channel!,
+		const bot = VeigoAssistant.instance.GetServer(interaction.guildId!);
+		bot?.JoinVoiceChannel(member.voice.channelId);
+		bot?.audioPlayer.Play(
 			interaction.options.get("query")!.value as string,
-			{
-				textChannel: interaction.channel as GuildTextBasedChannel,
-				member: interaction.member as GuildMember,
-				message: interaction.channel?.lastMessage!,
-				metadata: {
-					editReply: interaction.editReply.bind(interaction),
-				},
-			},
 		);
 	}
 }

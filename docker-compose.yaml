@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: vga-instance
+    ports:
+      - "80:8888"
+    env_file:
+      - .env
+    volumes:
+      - ./source:/app/source # this is a volume to allow hot reloading
+      - /app/node_modules # this is a volume to prevent node_modules from being overwritten by the volume above
