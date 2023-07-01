@@ -1,7 +1,5 @@
-import { Awaitable } from "discord.js";
 import {
 	AudioPlayerEventKeys,
-	AudioPlayerEvents,
 	AudioPlayerEventHandlers,
 } from "../audio/AudioPlayerEvent";
 

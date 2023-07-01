@@ -1,24 +1,34 @@
 import {
+	InteractionEditReplyOptions,
 	InternalDiscordGatewayAdapterCreator,
+	Message,
+	MessagePayload,
 	TextBasedChannel,
 } from "discord.js";
 import { VoiceConnection, joinVoiceChannel } from "@discordjs/voice";
+import path from "path";
 
 import AudioPlayer from "./AudioPlayer.js";
-import PlayEvent from "./events/Play.event.js";
-import Queue from "../utilities/Queue.js";
-import Audio from "./@types/Audio.js";
-import { AudioPlayerEventKeys, AudioPlayerEvents } from "./AudioPlayerEvent.js";
+import { AudioPlayerEventKeys } from "./AudioPlayerEvent.js";
 import AudioPlayerEvent from "../classes/AudioEvents.js";
+import DependencyLoader from "../utilities/DependencyLoader.js";
+import __dirname from "../utilities/__dirname.js";
+import LoggerService from "../services/Logger.service.js";
 
 class AudioPlayerManager {
 	private mServerId: string;
 	private mAdapterCreator: InternalDiscordGatewayAdapterCreator;
 	private mAudioPlayer: AudioPlayer;
 
-	private mTextChannelId: TextBasedChannel | null;
 	private mVoiceChannelId: string | null;
 	private mVoiceConnection: VoiceConnection | null;
+
+	private mTextChannel: TextBasedChannel | null;
+	private mEditReply:
+		| ((
+				options: string | MessagePayload | InteractionEditReplyOptions,
+		  ) => Promise<Message<boolean>>)
+		| null;
 
 	constructor(
 		serverId: string,
@@ -28,34 +38,65 @@ class AudioPlayerManager {
 		this.mAdapterCreator = serverVoiceAdapter;
 		this.mAudioPlayer = new AudioPlayer();
 
-		this.mTextChannelId = null;
 		this.mVoiceChannelId = null;
 		this.mVoiceConnection = null;
+
+		this.mTextChannel = null;
+		this.mEditReply = null;
 	}
 
 	public get audioPlayer() {
 		return this.mAudioPlayer;
 	}
 
-	AddListener<T extends AudioPlayerEventKeys>(
+	private AddEvent<T extends AudioPlayerEventKeys>(
 		event: AudioPlayerEvent<T>,
 	): void {
-		this.mAudioPlayer.on(
-			event.name,
-			event.listener({ textChannel: this.mTextChannelId }),
-		);
+		this.mAudioPlayer.on(event.name, event.listener(this));
 	}
 
-	AddListeners<T extends AudioPlayerEventKeys>(
-		events: AudioPlayerEvent<T>[],
-	): void {
-		for (const event of events) {
-			this.AddListener(event);
+	public async LoadEvents() {
+		const loadedEvents = await DependencyLoader(
+			path.join(__dirname(import.meta.url), "events"),
+			true,
+		);
+
+		for (const { default: event } of loadedEvents) {
+			if (event instanceof AudioPlayerEvent) {
+				this.AddEvent(event);
+			} else {
+				LoggerService.warning(`[WARNING] An event is missing`);
+			}
 		}
 	}
 
-	public SetTextChannel(channelId: TextBasedChannel) {
-		this.mTextChannelId = channelId;
+	/**
+	 * @description Sets the context for the audio player
+	 * Must be called before any audio can be played to work correctly
+	 *
+	 * @param textChannel The channel to send messages to
+	 * @param editReply The function to edit the reply message from the bot
+	 */
+	public SetContext(context: {
+		editReply:
+			| ((
+					options:
+						| string
+						| MessagePayload
+						| InteractionEditReplyOptions,
+			  ) => Promise<Message<boolean>>)
+			| null;
+		textChannel: TextBasedChannel | null;
+	}) {
+		this.mTextChannel = context.textChannel;
+		this.mEditReply = context.editReply;
+	}
+
+	public GetContext() {
+		return {
+			textChannel: this.mTextChannel,
+			editReply: this.mEditReply,
+		};
 	}
 
 	public JoinVoiceChannel(channelId: string) {

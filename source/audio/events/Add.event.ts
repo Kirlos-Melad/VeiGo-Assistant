@@ -1,44 +1,39 @@
-// import { Events, Queue, Song } from "distube";
+import {
+	EmbedBuilder,
+} from "discord.js";
+import AudioPlayerEvent from "../../classes/AudioEvents.js";
+import Audio from "../@types/Audio.js";
+import Queue from "../../utilities/Queue.js";
+import AudioPlayerManager from "../AudioPlayerManager.js";
 
-// import MusicPlayerEvent from "../../../classes/MusicPlayerEvent.js";
-// import {
-// 	EmbedBuilder,
-// 	InteractionEditReplyOptions,
-// 	Message,
-// 	MessagePayload,
-// } from "discord.js";
+class Add extends AudioPlayerEvent<"ADD_AUDIO"> {
+	constructor() {
+		super("ADD_AUDIO");
+	}
 
-// class Add extends MusicPlayerEvent<Events.ADD_SONG> {
-// 	public listener: (queue: Queue, song: Song<unknown>) => any;
+	public listener(context: AudioPlayerManager) {
+		return (queue: Queue<Audio>, audio: Audio) => {
+			const { editReply } = context.GetContext();
+			if (!editReply) return;
 
-// 	constructor() {
-// 		super(Events.ADD_SONG);
-// 		this.listener = this.handler;
-// 	}
+			const embed = new EmbedBuilder();
 
-// 	private handler(queue: Queue, song: Song<unknown>) {
-// 		const embed = new EmbedBuilder();
+			embed.setTitle("Added song to the queue");
+			embed.setDescription(
+				`New song **[${audio!.title}](${
+					audio!.url
+				})** was added to the queue!`,
+			);
+			embed.setThumbnail(audio!.thumbnail || null);
+			embed.setColor("#00ff00");
+			embed.addFields([]);
+			embed.setFooter({
+				text: `Duration: ${audio!.duration}`,
+			});
 
-// 		embed.setTitle("Added song to the queue");
-// 		embed.setDescription(
-// 			`New song **[${song!.name}](${
-// 				song!.url
-// 			})** was added to the queue!`,
-// 		);
-// 		embed.setThumbnail(song!.thumbnail || null);
-// 		embed.setColor("#00ff00");
-// 		embed.addFields([]);
-// 		embed.setFooter({
-// 			text: `Duration: ${song!.formattedDuration}`,
-// 		});
+			editReply({ embeds: [embed] });
+		};
+	}
+}
 
-// 		const metadata = song.metadata as {
-// 			editReply: (
-// 				options: string | MessagePayload | InteractionEditReplyOptions,
-// 			) => Promise<Message<boolean>>;
-// 		};
-// 		metadata?.editReply({ embeds: [embed] });
-// 	}
-// }
-
-// export default new Add();
+export default new Add();

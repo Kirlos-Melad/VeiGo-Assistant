@@ -1,10 +1,13 @@
 import { Client, REST, Routes, ClientEvents } from "discord.js";
+import path from "path";
+
 import BotEvent from "../classes/BotEvent.js";
 import Command from "../classes/Command.js";
-
 import { RetryAsyncCallback } from "../utilities/RetryCallback.js";
 import LoggerService from "../services/Logger.service.js";
 import AudioPlayerManager from "../audio/AudioPlayerManager.js";
+import DependencyLoader from "../utilities/DependencyLoader.js";
+import __dirname from "../utilities/__dirname.js";
 
 class ClientManager {
 	private static mInstance: ClientManager;
@@ -37,32 +40,48 @@ class ClientManager {
 		return ClientManager.mInstance;
 	}
 
-	public AddListener<T extends keyof ClientEvents>(event: BotEvent<T>): void {
+	private AddEvent<T extends keyof ClientEvents>(event: BotEvent<T>): void {
 		this.mDiscordClient.on(
 			event.name,
 			event.listener({ commands: this.mCommands }),
 		);
 	}
 
-	public AddListeners<T extends keyof ClientEvents>(
-		events: BotEvent<T>[],
-	): void {
-		for (const event of events) {
-			this.AddListener(event);
+	public async LoadEvents() {
+		const loadedEvents = await DependencyLoader(
+			path.join(__dirname(import.meta.url), "events"),
+			false,
+		);
+
+		for (const { default: event } of loadedEvents) {
+			if (event instanceof BotEvent) {
+				this.AddEvent(event);
+			} else {
+				LoggerService.warning(`[WARNING] An event is missing`);
+			}
 		}
 	}
 
-	public AddCommand(command: Command) {
+	private AddCommand(command: Command) {
 		this.mCommands[command.metadata.name] = command;
 	}
 
-	public AddCommands(commands: Command[]) {
-		for (const command of commands) {
-			this.AddCommand(command);
+	public async LoadCommands() {
+		const loadedEvents = await DependencyLoader(
+			path.join(__dirname(import.meta.url), "commands"),
+			true,
+		);
+
+		for (const { default: command } of loadedEvents) {
+			if (command instanceof Command) {
+				this.AddCommand(command);
+			} else {
+				LoggerService.warning(`[WARNING] A command is missing`);
+			}
 		}
 	}
 
-	public async UpdateClientCommands() {
+	public async UpdateCommands() {
 		const rest = new REST().setToken(process.env.CLIENT_TOKEN!);
 		const commandsMetadata = Object.values(this.mCommands).map(
 			(command) => {
@@ -81,7 +100,7 @@ class ClientManager {
 		});
 	}
 
-	public GetServer(serverId: string) {
+	public GetAudioPlayerManager(serverId: string) {
 		return this.mServers[serverId];
 	}
 
@@ -99,6 +118,10 @@ class ClientManager {
 				guild.voiceAdapterCreator,
 			);
 		});
+
+		await Promise.all(
+			Object.values(this.mServers).map((server) => server.LoadEvents()),
+		);
 
 		console.clear();
 		LoggerService.information(

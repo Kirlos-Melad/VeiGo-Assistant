@@ -39,10 +39,14 @@ class Play extends Command {
 			return;
 		}
 
-		const bot = VeigoAssistant.instance.GetServer(interaction.guildId!);
-		bot?.SetTextChannel(interaction.channel!);
-		bot?.JoinVoiceChannel(member.voice.channelId);
-		bot?.audioPlayer.Play(
+		const AudioPlayerManager =
+			VeigoAssistant.instance.GetAudioPlayerManager(interaction.guildId!);
+		AudioPlayerManager?.SetContext({
+			textChannel: interaction.channel ?? null,
+			editReply: interaction.editReply.bind(interaction),
+		});
+		AudioPlayerManager?.JoinVoiceChannel(member.voice.channelId);
+		AudioPlayerManager?.audioPlayer.Play(
 			interaction.options.get("query")!.value as string,
 		);
 	}

@@ -1,17 +1,19 @@
-import { Awaitable, EmbedBuilder, TextBasedChannel } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 import AudioPlayerEvent from "../../classes/AudioEvents.js";
 import Audio from "../@types/Audio.js";
 import Queue from "../../utilities/Queue.js";
+import AudioPlayerManager from "../AudioPlayerManager.js";
 
 class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
 	constructor() {
 		super("PLAY_AUDIO");
 	}
 
-	public listener(context: { textChannel: TextBasedChannel | null }) {
+	public listener(context: AudioPlayerManager) {
 		return (queue: Queue<Audio>, audio: Audio) => {
-			if (!context.textChannel) return;
+			const { textChannel } = context.GetContext();
+			if (!textChannel) return;
 
 			const embed = new EmbedBuilder();
 
@@ -26,7 +28,7 @@ class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
 				text: `Duration: ${audio!.duration}`,
 			});
 
-			context.textChannel.send({ embeds: [embed] });
+			textChannel.send({ embeds: [embed] });
 		};
 	}
 }
