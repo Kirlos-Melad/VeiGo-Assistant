@@ -4,6 +4,8 @@ SHELL ["/bin/bash", "-c"]
 
 # Install important dependencies
 RUN apt-get update -y
+RUN apt-get autoclean
+RUN apt-get autoremove 
 RUN apt-get install -y build-essential
 RUN apt-get install -y libtool
 RUN apt-get install -y python3
@@ -23,19 +25,15 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | b
 # Change working directory
 WORKDIR /app
 
+ARG STEP1=true
 COPY package.json .
 
-# # download for private repo, probably you're behind firewall
-# RUN curl -k -o node-v19.0.0-headers.tar.gz -L https://nodejs.org/download/release/v19.0.0/node-v19.0.0-headers.tar.gz
-
-# # capture the absolute path
-# RUN TARBALL_PATH=$(pwd) \
-#     && npm config set tarball ${TARBALL_PATH}/node-v19.0.0-headers.tar.gz
-
 # Install application dependencies
+ARG STEP2=true
 RUN npm install
 
 # Copy all files from the current directory to the working directory
+ARG STEP3=true
 COPY . .
 
 EXPOSE 8888

@@ -1,71 +1,128 @@
 // Libraries
-//import youtubeStreamer from "ytdl-core";
-import { search as audioSearch, search, stream as urlStream } from "play-dl";
+import { search as audioSearch, stream as urlStream } from "play-dl";
 import {
 	createAudioPlayer,
 	createAudioResource,
 	AudioPlayer as DiscordAudioPlayer,
 	AudioPlayerStatus,
 	NoSubscriberBehavior,
-	demuxProbe,
 } from "@discordjs/voice";
+import { TypedEmitter } from "tiny-typed-emitter";
 
 // Modules
-import Queue from "./Queue.js";
+import Queue from "../utilities/Queue.js";
 import Audio from "./@types/Audio.js";
+import {
+	AudioPlayerEventKeys,
+	AudioPlayerEventHandlers,
+} from "./AudioPlayerEvent.js";
+import LoggerService from "../services/Logger.service.js";
 
-class AudioPlayer {
+type SearchOptions = { limit?: number };
+
+class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 	private mQueue: Queue<Audio>;
 	private mPlayer: DiscordAudioPlayer;
 
 	constructor() {
-		this.mQueue = new Queue<Audio>({});
-		this.mPlayer = createAudioPlayer({
-			behaviors: { noSubscriber: NoSubscriberBehavior.Pause },
-		});
+		super();
+
+		this.mQueue = new Queue<Audio>();
+		this.mPlayer = this.InitializePlayer();
 	}
 
-	private async Search(query: string) {
-		const [searchResult] = await audioSearch(query, {
-			limit: 1,
-			//source: { youtube: "video" },
+	private InitializePlayer() {
+		const player = createAudioPlayer({
+			behaviors: { noSubscriber: NoSubscriberBehavior.Pause },
 		});
 
-		if (!searchResult) throw new Error("No results found.");
+		player.on("stateChange", (oldState, newState) => {
+			if (
+				oldState.status === AudioPlayerStatus.Playing &&
+				newState.status === AudioPlayerStatus.Idle
+			) {
+				this.emit("FINISH_AUDIO", this.mQueue, this.mQueue.First());
 
-		const { type, stream } = await urlStream(searchResult.url);
+				if (this.mQueue.Peek()) {
+					const audio = this.mQueue.Next();
+					this.PlayAudio(audio);
+				} else {
+					this.emit("EMPTY_QUEUE", this.mQueue);
+				}
+			}
+		});
 
-		const audio: Audio = {
-			title: searchResult.title!,
-			url: searchResult.url,
-			thumbnail: searchResult.thumbnails[0]!.url,
-			duration: searchResult.durationRaw,
+		player.on("error", (error) => {
+			LoggerService.error(error);
+		});
 
-			stream: stream,
-			streamType: type,
+		player.on("unsubscribe", (subscription) => {
+			this.mPlayer.stop();
+			this.mQueue.Clear();
+		});
+
+		return player;
+	}
+
+	/**
+	 * Search for audio
+	 */
+	private async Search(query: string, options?: SearchOptions) {
+		options = {
+			...options,
+			// Default limit is 1 if not specified or is less than 1
+			limit: options?.limit && options.limit > 0 ? options.limit : 1,
 		};
 
-		return audio;
+		const searchResults = await audioSearch(query, options);
+
+		this.emit("SEARCH_AUDIO", query, searchResults);
+
+		return searchResults;
 	}
 
 	private async AddAudio(audio: Audio) {
 		this.mQueue.Append(audio);
+		this.emit("ADD_AUDIO", this.mQueue, audio);
 	}
 
-	public async Play(query: string) {
-		const audio = await this.Search(query);
-		this.AddAudio(audio);
-
-		if (this.mPlayer.state.status !== AudioPlayerStatus.Idle) return;
-
-		const audioResource = createAudioResource(audio.stream, {
-			inputType: audio.streamType,
+	private async PlayAudio(audio: Audio) {
+		const { type, stream } = await urlStream(audio.url);
+		const audioResource = createAudioResource(stream, {
+			inputType: type,
 		});
 
+		this.emit("PLAY_AUDIO", this.mQueue, audio);
 		//TODO: check the state of the controller then act accordingly
 		this.mPlayer.play(audioResource);
 	}
 
+	/**
+	 * @param query The search query
+	 *
+	 *
+	 */
+	public async Play(query: string) {
+		const results = await this.Search(query);
+
+		//TODO: Enhance the audio selection process
+		const audio: Audio = {
+			title: results[0]!.title!,
+			url: results[0]!.url,
+			thumbnail: results[0]!.thumbnails[0]!.url,
+			duration: results[0]!.durationRaw,
+		};
+
+		this.AddAudio(audio);
+
+		if (this.mPlayer.state.status !== AudioPlayerStatus.Idle) return;
+
+		this.PlayAudio(audio);
+	}
+
+	/**
+	 * @returns DiscordAudioPlayer instance
+	 */
 	public get player() {
 		return this.mPlayer;
 	}

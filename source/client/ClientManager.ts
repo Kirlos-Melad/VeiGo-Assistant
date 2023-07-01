@@ -4,14 +4,14 @@ import Command from "../classes/Command.js";
 
 import { RetryAsyncCallback } from "../utilities/RetryCallback.js";
 import LoggerService from "../services/Logger.service.js";
-import ServerBot from "./ServerBot.js";
+import AudioPlayerManager from "../audio/AudioPlayerManager.js";
 
-class VeigoAssistant {
-	private static mInstance: VeigoAssistant;
+class ClientManager {
+	private static mInstance: ClientManager;
 
 	private mDiscordClient: Client;
 	private mCommands: Record<string, Command>;
-	private mServers: Record<string, ServerBot>;
+	private mServers: Record<string, AudioPlayerManager>;
 
 	private constructor(discordClient: Client) {
 		this.mDiscordClient = discordClient;
@@ -20,48 +20,35 @@ class VeigoAssistant {
 	}
 
 	public static Create(discordClient: Client) {
-		if (!VeigoAssistant.mInstance) {
-			VeigoAssistant.mInstance = new VeigoAssistant(discordClient);
+		if (!ClientManager.mInstance) {
+			ClientManager.mInstance = new ClientManager(discordClient);
 		} else {
 			LoggerService.warning("[WARNING] Bot has already been created");
 		}
 
-		return VeigoAssistant.mInstance;
+		return ClientManager.mInstance;
 	}
 
 	public static get instance() {
-		if (!VeigoAssistant.mInstance) {
+		if (!ClientManager.mInstance) {
 			throw new Error("Bot has not been created yet");
 		}
 
-		return VeigoAssistant.mInstance;
+		return ClientManager.mInstance;
 	}
 
-	/* Overloaded function */
-	AddEvent<T extends keyof ClientEvents>(event: BotEvent<T>): void;
-	// AddEvent<T extends keyof typeof GuildQueueEvent>(
-	// 	event: AudioPlayerEvent<T>,
-	// ): void;
-	AddEvent(event: any): void {
-		// Implement the method logic here
-		// You can use type guards to distinguish between BotEvent and AudioPlayerEvent
-		if (event instanceof BotEvent) {
-			this.mDiscordClient.on(event.name, (...args: ClientEvents[]) => {
-				event.listener({ commands: this.mCommands }, ...args);
-			});
-		}
-		// else if (event instanceof AudioPlayerEvent) {
-		// 	this.mAudioPlayer.events.on(event.name, event.listener);
-		// }
+	public AddListener<T extends keyof ClientEvents>(event: BotEvent<T>): void {
+		this.mDiscordClient.on(
+			event.name,
+			event.listener({ commands: this.mCommands }),
+		);
 	}
 
-	AddListeners<T extends keyof ClientEvents>(events: BotEvent<T>[]): void;
-	// AddListeners<T extends keyof typeof GuildQueueEvent>(
-	// 	events: AudioPlayerEvent<T>[],
-	// ): void;
-	AddListeners(events: any[]): void {
+	public AddListeners<T extends keyof ClientEvents>(
+		events: BotEvent<T>[],
+	): void {
 		for (const event of events) {
-			this.AddEvent(event);
+			this.AddListener(event);
 		}
 	}
 
@@ -107,7 +94,7 @@ class VeigoAssistant {
 		});
 
 		this.mDiscordClient.guilds.cache.forEach((guild) => {
-			this.mServers[guild.id] = new ServerBot(
+			this.mServers[guild.id] = new AudioPlayerManager(
 				guild.id,
 				guild.voiceAdapterCreator,
 			);
@@ -120,4 +107,4 @@ class VeigoAssistant {
 	}
 }
 
-export default VeigoAssistant;
+export default ClientManager;

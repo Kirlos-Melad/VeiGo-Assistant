@@ -8,18 +8,18 @@ class Queue<T = unknown> {
 	private mLoop: boolean;
 	private mCursor: number;
 
-	constructor(options: QueueOptions<T>);
+	constructor(options?: QueueOptions<T>);
 	constructor(queue: T[], options?: Omit<QueueOptions<T>, "queue">);
 	constructor(
-		queueOrOptions: T[] | QueueOptions<T>,
+		queueOrOptions?: T[] | QueueOptions<T>,
 		options?: Omit<QueueOptions<T>, "queue">,
 	) {
-		if (Array.isArray(queueOrOptions)) {
-			this.mQueue = queueOrOptions;
-			this.mLoop = options?.loop ?? false;
-		} else {
+		if (!queueOrOptions || !Array.isArray(queueOrOptions)) {
 			this.mQueue = queueOrOptions?.queue || [];
 			this.mLoop = queueOrOptions?.loop ?? false;
+		} else {
+			this.mQueue = queueOrOptions;
+			this.mLoop = options?.loop ?? false;
 		}
 
 		this.mCursor = 0;

@@ -1,11 +1,12 @@
 import path from "path";
 
 import { Client, GatewayIntentBits } from "discord.js";
-import VeigoAssistant from "./client/VeigoAssistant.js";
+import VeigoAssistant from "./client/ClientManager.js";
 import __dirname from "./utilities/__dirname.js";
 import DependencyLoader from "./utilities/DependencyLoader.js";
 import Command from "./classes/Command.js";
 import BotEvent from "./classes/BotEvent.js";
+import LoggerService from "./services/Logger.service.js";
 
 async function LoadCommands(directory: string, recursive?: boolean) {
 	const vgaInstance = VeigoAssistant.instance;
@@ -16,7 +17,7 @@ async function LoadCommands(directory: string, recursive?: boolean) {
 		if (command instanceof Command) {
 			vgaInstance.AddCommand(command);
 		} else {
-			console.log(`[WARNING] A command is missing`);
+			LoggerService.warning(`[WARNING] A command is missing`);
 		}
 	}
 }
@@ -29,9 +30,9 @@ async function LoadEvents(directory: string, recursive?: boolean) {
 		const { default: event } = eventImports;
 
 		if (event instanceof BotEvent) {
-			vgaInstance.AddEvent(event);
+			vgaInstance.AddListener(event);
 		} else {
-			console.log(`[WARNING] An event is missing`);
+			LoggerService.warning(`[WARNING] An event is missing`);
 		}
 	}
 }

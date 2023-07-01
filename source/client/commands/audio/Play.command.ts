@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import Command from "../../../classes/Command.js";
-import VeigoAssistant from "../../VeigoAssistant.js";
+import VeigoAssistant from "../../ClientManager.js";
 
 class Play extends Command {
 	constructor() {
@@ -40,6 +40,7 @@ class Play extends Command {
 		}
 
 		const bot = VeigoAssistant.instance.GetServer(interaction.guildId!);
+		bot?.SetTextChannel(interaction.channel!);
 		bot?.JoinVoiceChannel(member.voice.channelId);
 		bot?.audioPlayer.Play(
 			interaction.options.get("query")!.value as string,

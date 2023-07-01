@@ -8,9 +8,8 @@ abstract class BotEvent<T extends keyof ClientEvents> {
 	}
 
 	public abstract listener(
-		context: any,
-		...args: ClientEvents[T]
-	): Awaitable<void>;
+		context: unknown,
+	): (...args: ClientEvents[T]) => Awaitable<void>;
 
 	public get name() {
 		return this.mName;
