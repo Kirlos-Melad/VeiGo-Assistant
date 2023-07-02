@@ -1,5 +1,10 @@
 // Libraries
-import { search as audioSearch, stream as urlStream } from "play-dl";
+import {
+	search as audioSearch,
+	stream as urlStream,
+	video_basic_info,
+	validate as validateUrl,
+} from "play-dl";
 import {
 	createAudioPlayer,
 	createAudioResource,
@@ -53,12 +58,17 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 		});
 
 		player.on("error", (error) => {
-			LoggerService.error(error);
+			this.emit("ERROR", error);
 		});
 
 		player.on("unsubscribe", (subscription) => {
+			this.emit("DESTROY_QUEUE", this.mQueue);
 			this.mPlayer.stop();
 			this.mQueue.Clear();
+		});
+
+		player.on("debug", (message) => {
+			LoggerService.information(message);
 		});
 
 		return player;
@@ -75,6 +85,7 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 		};
 
 		const searchResults = await audioSearch(query, options);
+		console.log(searchResults);
 
 		this.emit("SEARCH_AUDIO", query, searchResults);
 
@@ -98,12 +109,14 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 	}
 
 	/**
-	 * @param query The search query
+	 * @param query The search query or URL
 	 *
 	 *
 	 */
 	public async Play(query: string) {
-		const results = await this.Search(query);
+		let results;
+		if (!(await validateUrl(query))) results = await this.Search(query);
+		else results = [(await video_basic_info(query)).video_details];
 
 		//TODO: Enhance the audio selection process
 		const audio: Audio = {

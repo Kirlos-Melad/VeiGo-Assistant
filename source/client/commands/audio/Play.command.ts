@@ -12,10 +12,10 @@ class Play extends Command {
 	protected buildCommand() {
 		this.mCommandBuilder
 			.setName("play")
-			.setDescription("Plays music from youtube.")
+			.setDescription("Plays audio")
 			.addStringOption((option) => {
-				option.setName("query");
-				option.setDescription("The query to search for.");
+				option.setName("value");
+				option.setDescription("A search query or URL");
 				option.setRequired(true);
 				return option;
 			});
@@ -47,7 +47,7 @@ class Play extends Command {
 		});
 		AudioPlayerManager?.JoinVoiceChannel(member.voice.channelId);
 		AudioPlayerManager?.audioPlayer.Play(
-			interaction.options.get("query")!.value as string,
+			interaction.options.get("value")!.value as string,
 		);
 	}
 }

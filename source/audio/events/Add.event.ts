@@ -15,9 +15,9 @@ class Add extends AudioPlayerEvent<"ADD_AUDIO"> {
 			if (!editReply) return;
 
 			const embed = new EmbedBuilder()
-				.setTitle("New Song Added to Queue")
+				.setTitle("New audio added to queue")
 				.setDescription(
-					`🎵 A new song has been added to the queue: **[${
+					`🎵 A new audio has been added to the queue: **[${
 						audio!.title
 					}](${audio!.url})**`,
 				)

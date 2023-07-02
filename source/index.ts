@@ -5,8 +5,6 @@ import path from "path";
 import VeigoAssistant from "./client/ClientManager.js";
 import __dirname from "./utilities/__dirname.js";
 
-console.log(process.env.IS_PRODUCTION);
-
 if (!process.env.IS_PRODUCTION)
 	config({
 		path: path.join(__dirname(import.meta.url), "..", ".env"),

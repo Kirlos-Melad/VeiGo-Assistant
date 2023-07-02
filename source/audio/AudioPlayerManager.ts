@@ -107,7 +107,6 @@ class AudioPlayerManager {
 			adapterCreator: this.mAdapterCreator,
 		});
 
-		this.mVoiceConnection.subscribe;
 		this.mVoiceConnection.subscribe(this.mAudioPlayer.player);
 	}
 

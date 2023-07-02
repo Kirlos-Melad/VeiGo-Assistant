@@ -21,6 +21,10 @@ type AudioPlayerEvents = {
 	RESUME_AUDIO: [queue: Queue<Audio>, audio: Audio];
 
 	EMPTY_QUEUE: [queue: Queue<Audio>];
+
+	DESTROY_QUEUE: [queue: Queue<Audio>];
+
+	ERROR: [error: any];
 };
 
 type AudioPlayerEventKeys = keyof AudioPlayerEvents;
