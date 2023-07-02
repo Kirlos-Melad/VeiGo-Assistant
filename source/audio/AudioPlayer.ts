@@ -85,7 +85,6 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 		};
 
 		const searchResults = await audioSearch(query, options);
-		console.log(searchResults);
 
 		this.emit("SEARCH_AUDIO", query, searchResults);
 
@@ -115,8 +114,17 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 	 */
 	public async Play(query: string) {
 		let results;
-		if (!(await validateUrl(query))) results = await this.Search(query);
-		else results = [(await video_basic_info(query)).video_details];
+		const validationResult = await validateUrl(query);
+		if (validationResult === "search") results = await this.Search(query);
+		else if (validationResult !== false)
+			results = [(await video_basic_info(query)).video_details];
+		else {
+			this.emit("ERROR", {
+				name: "Invalid URL or search query",
+				message: `${query} is not a valid URL or search query}`,
+			});
+			return;
+		}
 
 		//TODO: Enhance the audio selection process
 		const audio: Audio = {
