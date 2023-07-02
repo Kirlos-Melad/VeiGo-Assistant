@@ -1,10 +1,16 @@
 import { Client, GatewayIntentBits } from "discord.js";
+import { config } from "dotenv";
+import path from "path";
+
 import VeigoAssistant from "./client/ClientManager.js";
 import __dirname from "./utilities/__dirname.js";
-import DependencyLoader from "./utilities/DependencyLoader.js";
-import Command from "./classes/Command.js";
-import BotEvent from "./classes/BotEvent.js";
-import LoggerService from "./services/Logger.service.js";
+
+console.log(process.env.IS_PRODUCTION);
+
+if (!process.env.IS_PRODUCTION)
+	config({
+		path: path.join(__dirname(import.meta.url), "..", ".env"),
+	});
 
 const client = new Client({
 	intents: [

@@ -17,16 +17,18 @@ class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
 
 			const embed = new EmbedBuilder();
 
-			embed.setTitle("Playing song");
+			embed.setTitle("Now Playing");
 			embed.setDescription(
-				`Playing **[${audio!.title}](${audio!.url})**`,
+				`🎶 Playing: **[${audio!.title}](${audio!.url})**`,
 			);
-			embed.setThumbnail(audio!.thumbnail || null);
-			embed.setColor("#00ff00");
-			embed.addFields([]);
-			embed.setFooter({
-				text: `Duration: ${audio!.duration}`,
-			});
+			embed.setThumbnail(audio!.thumbnail);
+			embed.addFields([
+				{
+					name: "Duration",
+					value: audio!.duration,
+					inline: true,
+				},
+			]);
 
 			textChannel.send({ embeds: [embed] });
 		};

@@ -1,6 +1,4 @@
-import {
-	EmbedBuilder,
-} from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import AudioPlayerEvent from "../../classes/AudioEvents.js";
 import Audio from "../@types/Audio.js";
 import Queue from "../../utilities/Queue.js";
@@ -16,20 +14,26 @@ class Add extends AudioPlayerEvent<"ADD_AUDIO"> {
 			const { editReply } = context.GetContext();
 			if (!editReply) return;
 
-			const embed = new EmbedBuilder();
-
-			embed.setTitle("Added song to the queue");
-			embed.setDescription(
-				`New song **[${audio!.title}](${
-					audio!.url
-				})** was added to the queue!`,
-			);
-			embed.setThumbnail(audio!.thumbnail || null);
-			embed.setColor("#00ff00");
-			embed.addFields([]);
-			embed.setFooter({
-				text: `Duration: ${audio!.duration}`,
-			});
+			const embed = new EmbedBuilder()
+				.setTitle("New Song Added to Queue")
+				.setDescription(
+					`🎵 A new song has been added to the queue: **[${
+						audio!.title
+					}](${audio!.url})**`,
+				)
+				.setThumbnail(audio!.thumbnail)
+				.addFields([
+					{
+						name: "Duration",
+						value: audio!.duration,
+						inline: true,
+					},
+				])
+				.setFooter({
+					text: "Developed by Veigo 😎🔥",
+					iconURL:
+						"https://avatars.githubusercontent.com/u/52179817?v=4",
+				});
 
 			editReply({ embeds: [embed] });
 		};
