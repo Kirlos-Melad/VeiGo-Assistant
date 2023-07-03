@@ -188,7 +188,8 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 		if (this.mPlayer.state.status !== AudioPlayerStatus.Idle) return;
 
 		//? Move to the next audio if the current audio is IDLE ONLY
-		this.PlayAudio(this.mQueue.Next());
+		if (this.mQueue.Peek()) this.mQueue.Next();
+		this.PlayAudio(audio);
 	}
 
 	public Skip() {
