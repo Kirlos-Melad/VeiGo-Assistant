@@ -110,10 +110,7 @@ class ClientManager {
 
 	public async Run() {
 		await RetryAsyncCallback(3, async () => {
-			await Promise.all([
-				//this.mAudioPlayer.extractors.register(YouTubeExtractor, {}),
-				this.mDiscordClient.login(process.env.CLIENT_TOKEN),
-			]);
+			await this.mDiscordClient.login(process.env.CLIENT_TOKEN);
 		});
 
 		this.mDiscordClient.guilds.cache.forEach((guild) => {
@@ -129,7 +126,7 @@ class ClientManager {
 
 		console.clear();
 		LoggerService.information(
-			`${this.mDiscordClient.user?.username} is online!`,
+			`${this.mDiscordClient.user?.username} is ready to go!`,
 		);
 	}
 }

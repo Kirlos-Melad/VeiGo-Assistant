@@ -199,6 +199,22 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 		this.mPlayer.stop();
 	}
 
+	public Pause() {
+		if (this.mPlayer.state.status !== AudioPlayerStatus.Playing) return;
+
+		const isPaused = this.mPlayer.pause();
+		if (isPaused)
+			this.emit("PAUSE_AUDIO", this.mQueue, this.mQueue.First());
+	}
+
+	public Resume() {
+		if (this.mPlayer.state.status !== AudioPlayerStatus.Paused) return;
+
+		const isResumed = this.mPlayer.unpause();
+		if (isResumed)
+			this.emit("RESUME_AUDIO", this.mQueue, this.mQueue.First());
+	}
+
 	/**
 	 * @returns DiscordAudioPlayer instance
 	 */
