@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import Command from "../../../classes/Command.js";
 import ClientManager from "../../ClientManager.js";
 

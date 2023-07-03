@@ -55,6 +55,7 @@ class ClientManager {
 
 		for (const { default: event } of loadedEvents) {
 			if (event instanceof BotEvent) {
+				LoggerService.information(`Loaded event ${event.name}`);
 				this.AddEvent(event);
 			} else {
 				LoggerService.warning(`[WARNING] An event is missing`);
@@ -74,6 +75,9 @@ class ClientManager {
 
 		for (const { default: command } of loadedEvents) {
 			if (command instanceof Command) {
+				LoggerService.information(
+					`Loaded command ${command.metadata.name}`,
+				);
 				this.AddCommand(command);
 			} else {
 				LoggerService.warning(`[WARNING] A command is missing`);

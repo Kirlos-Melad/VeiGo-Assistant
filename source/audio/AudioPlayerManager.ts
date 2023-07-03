@@ -63,6 +63,7 @@ class AudioPlayerManager {
 
 		for (const { default: event } of loadedEvents) {
 			if (event instanceof AudioPlayerEvent) {
+				LoggerService.information(`Loaded event ${event.name}`);
 				this.AddEvent(event);
 			} else {
 				LoggerService.warning(`[WARNING] An event is missing`);
