@@ -23,6 +23,6 @@ const client = new Client({
 
 const vgaInstance = ClientManager.Create(client);
 await Promise.all([vgaInstance.LoadEvents(), vgaInstance.LoadCommands()]);
-vgaInstance.UpdateCommands();
+await vgaInstance.UpdateCommands();
 
 await vgaInstance.Run();
