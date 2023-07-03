@@ -1,6 +1,6 @@
 interface Audio {
 	url: string;
-	title: string;
+	name: string;
 	thumbnail: string;
 	duration: string;
 }

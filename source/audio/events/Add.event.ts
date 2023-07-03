@@ -17,15 +17,13 @@ class Add extends AudioPlayerEvent<"ADD_AUDIO"> {
 			const embed = new EmbedBuilder()
 				.setTitle("New audio added to queue")
 				.setDescription(
-					`🎵 A new audio has been added to the queue: **[${
-						audio!.title
-					}](${audio!.url})**`,
+					`🎵 A new audio has been added to the queue: **[${audio.name}](${audio.url})**`,
 				)
-				.setThumbnail(audio!.thumbnail)
+				.setThumbnail(audio.thumbnail)
 				.addFields([
 					{
 						name: "Duration",
-						value: audio!.duration,
+						value: audio.duration,
 						inline: true,
 					},
 				])

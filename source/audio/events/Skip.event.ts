@@ -1,13 +1,12 @@
 import { EmbedBuilder } from "discord.js";
-
 import AudioPlayerEvent from "../../classes/AudioEvents.js";
 import Audio from "../@types/Audio.js";
 import Queue from "../../utilities/Queue.js";
 import AudioPlayerManager from "../AudioPlayerManager.js";
 
-class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
+class Add extends AudioPlayerEvent<"SKIP_AUDIO"> {
 	constructor() {
-		super("PLAY_AUDIO");
+		super("SKIP_AUDIO");
 	}
 
 	public listener(context: AudioPlayerManager) {
@@ -15,14 +14,10 @@ class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
 			const { textChannel } = context.GetContext();
 			if (!textChannel) return;
 
-			const embed = new EmbedBuilder();
-
-			embed.setTitle("Now Playing");
-			embed.setDescription(
-				`🎶 Playing: **[${audio.name}](${audio.url})**`,
-			);
-			embed.setThumbnail(audio.thumbnail);
-			embed
+			const embed = new EmbedBuilder()
+				.setTitle("Audio Skipped")
+				.setDescription(`⏩ Skipped: **[${audio.name}](${audio.url})**`)
+				.setThumbnail(audio.thumbnail)
 				.addFields([
 					{
 						name: "Duration",
@@ -41,4 +36,4 @@ class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
 	}
 }
 
-export default new Play();
+export default new Add();

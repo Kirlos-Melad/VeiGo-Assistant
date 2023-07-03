@@ -2,7 +2,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 import { config } from "dotenv";
 import path from "path";
 
-import VeigoAssistant from "./client/ClientManager.js";
+import ClientManager from "./client/ClientManager.js";
 import __dirname from "./utilities/__dirname.js";
 
 if (!process.env.IS_PRODUCTION)
@@ -21,7 +21,7 @@ const client = new Client({
 	],
 });
 
-const vgaInstance = VeigoAssistant.Create(client);
+const vgaInstance = ClientManager.Create(client);
 await Promise.all([vgaInstance.LoadEvents(), vgaInstance.LoadCommands()]);
 vgaInstance.UpdateCommands();
 

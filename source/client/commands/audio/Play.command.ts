@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import Command from "../../../classes/Command.js";
-import VeigoAssistant from "../../ClientManager.js";
+import ClientManager from "../../ClientManager.js";
 
 class Play extends Command {
 	constructor() {
@@ -39,8 +39,9 @@ class Play extends Command {
 			return;
 		}
 
-		const AudioPlayerManager =
-			VeigoAssistant.instance.GetAudioPlayerManager(interaction.guildId!);
+		const AudioPlayerManager = ClientManager.instance.GetAudioPlayerManager(
+			interaction.guildId!,
+		);
 		AudioPlayerManager?.SetContext({
 			textChannel: interaction.channel ?? null,
 			editReply: interaction.editReply.bind(interaction),
