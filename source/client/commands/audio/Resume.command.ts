@@ -16,10 +16,6 @@ class Resume extends Command<SlashCommandSubcommandBuilder> {
 	}
 
 	async execute(interaction: ChatInputCommandInteraction) {
-		await interaction.deferReply({
-			ephemeral: true,
-		});
-
 		const member = await interaction.guild?.members.fetch({
 			user: interaction.user.id,
 		});

@@ -17,9 +17,8 @@ class Hello extends Command<SlashCommandSubcommandBuilder> {
 	}
 
 	public async execute(interaction: ChatInputCommandInteraction) {
-		await interaction.reply({
+		await interaction.editReply({
 			content: `Hello ${interaction.user.username} my name is ${interaction.client.user?.username}, And i'm here to help you!`,
-			ephemeral: true,
 		});
 	}
 }

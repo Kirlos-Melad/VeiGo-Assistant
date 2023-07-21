@@ -26,10 +26,6 @@ class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
 	}
 
 	public async execute(interaction: ChatInputCommandInteraction) {
-		await interaction.deferReply({
-			ephemeral: true,
-		});
-
 		const serverManager = ClientManager.instance.GetServerManager(
 			interaction.guildId!,
 		);

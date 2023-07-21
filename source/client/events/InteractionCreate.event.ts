@@ -49,6 +49,10 @@ class InteractionCreate extends BotEvent<Events.InteractionCreate> {
 			}
 
 			try {
+				await interaction.deferReply({
+					ephemeral: true,
+				});
+
 				await command.execute(interaction);
 			} catch (error) {
 				LoggerService.error(error);
