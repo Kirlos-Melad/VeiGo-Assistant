@@ -1,11 +1,11 @@
 import path from "path";
-
-import DependencyLoader from "../../utilities/DependencyLoader.js";
-import __dirname from "../../utilities/__dirname.js";
-import GroupCommand from "../../core/GroupCommand.js";
-import LoggerService from "../../services/Logger.service.js";
 import { SlashCommandBuilder } from "discord.js";
-import Command from "../../classes/Command.js";
+
+import DependencyLoader from "../../utilities/DependencyLoader.ts";
+import __dirname from "../../utilities/__dirname.ts";
+import GroupCommand from "../../core/GroupCommand.ts";
+import LoggerService from "../../services/Logger.service.ts";
+import Command from "../../classes/Command.ts";
 
 async function LoadCommands(groupCommand: GroupCommand, directory: string) {
 	const loadedEvents = await DependencyLoader(

@@ -1,4 +1,4 @@
-import { ClientEvents, Events, Awaitable, Client } from "discord.js";
+import { ClientEvents, Awaitable } from "discord.js";
 
 abstract class BotEvent<T extends keyof ClientEvents> {
 	protected mName: T;

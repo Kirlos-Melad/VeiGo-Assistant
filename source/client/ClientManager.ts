@@ -3,18 +3,16 @@ import {
 	REST,
 	Routes,
 	ClientEvents,
-	ChannelType,
-	SlashCommandBuilder,
 } from "discord.js";
 import path from "path";
 
-import BotEvent from "../classes/BotEvent.js";
-import { RetryAsyncCallback } from "../utilities/RetryCallback.js";
-import LoggerService from "../services/Logger.service.js";
-import ServerManager from "../core/ServerManager.js";
-import DependencyLoader from "../utilities/DependencyLoader.js";
-import __dirname from "../utilities/__dirname.js";
-import GroupCommand from "../core/GroupCommand.js";
+import BotEvent from "../classes/BotEvent.ts";
+import { RetryAsyncCallback } from "../utilities/RetryCallback.ts";
+import LoggerService from "../services/Logger.service.ts";
+import ServerManager from "../core/ServerManager.ts";
+import DependencyLoader from "../utilities/DependencyLoader.ts";
+import __dirname from "../utilities/__dirname.ts";
+import GroupCommand from "../core/GroupCommand.ts";
 
 class ClientManager {
 	private static mInstance: ClientManager;

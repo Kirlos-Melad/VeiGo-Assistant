@@ -1,4 +1,4 @@
-import { AudioPlayerEventHandlers, AudioPlayerEventKeys } from "../audio/AudioPlayer";
+import { AudioPlayerEventHandlers, AudioPlayerEventKeys } from "../audio/AudioPlayer.ts";
 
 
 abstract class AudioPlayerEvent<T extends AudioPlayerEventKeys> {

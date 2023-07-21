@@ -6,11 +6,11 @@ import {
 import { getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import path from "path";
 
-import AudioPlayer, { AudioPlayerEventKeys } from "../audio/AudioPlayer.js";
-import AudioPlayerEvent from "../classes/AudioEvents.js";
-import DependencyLoader from "../utilities/DependencyLoader.js";
-import __dirname from "../utilities/__dirname.js";
-import LoggerService from "../services/Logger.service.js";
+import AudioPlayer, { AudioPlayerEventKeys } from "../audio/AudioPlayer.ts";
+import AudioPlayerEvent from "../classes/AudioEvents.ts";
+import DependencyLoader from "../utilities/DependencyLoader.ts";
+import __dirname from "../utilities/__dirname.ts";
+import LoggerService from "../services/Logger.service.ts";
 
 class ServerManager {
 	private mServer: Guild;

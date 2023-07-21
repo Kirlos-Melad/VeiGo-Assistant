@@ -1,8 +1,8 @@
-interface Audio {
+interface IAudio {
 	url: string;
 	name: string;
 	thumbnail: string;
 	duration: string;
 }
 
-export default Audio;
+export default IAudio;

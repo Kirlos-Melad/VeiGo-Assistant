@@ -1,6 +1,7 @@
 import { createLogger, format, transports, Logger } from "winston";
-import DateFormatter from "../utilities/DateFormatter.js";
 import wrapAnsi from "wrap-ansi";
+
+import DateFormatter from "../utilities/DateFormatter.ts";
 
 const { combine, colorize, printf } = format;
 

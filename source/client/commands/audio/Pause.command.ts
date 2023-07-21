@@ -2,8 +2,9 @@ import {
 	ChatInputCommandInteraction,
 	SlashCommandSubcommandBuilder,
 } from "discord.js";
-import Command from "../../../classes/Command.js";
-import ClientManager from "../../ClientManager.js";
+
+import Command from "../../../classes/Command.ts";
+import ClientManager from "../../ClientManager.ts";
 
 class Pause extends Command<SlashCommandSubcommandBuilder> {
 	constructor() {

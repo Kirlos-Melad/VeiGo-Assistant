@@ -5,10 +5,10 @@ import {
 	SlashCommandBuilder,
 } from "discord.js";
 
-import BotEvent from "../../classes/BotEvent.js";
-import LoggerService from "../../services/Logger.service.js";
-import Command from "../../classes/Command.js";
-import ClientManager from "../ClientManager.js";
+import BotEvent from "../../classes/BotEvent.ts";
+import LoggerService from "../../services/Logger.service.ts";
+import Command from "../../classes/Command.ts";
+import ClientManager from "../ClientManager.ts";
 
 class InteractionCreate extends BotEvent<Events.InteractionCreate> {
 	constructor() {

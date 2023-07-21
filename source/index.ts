@@ -2,8 +2,8 @@ import { Client, GatewayIntentBits } from "discord.js";
 import { config } from "dotenv";
 import path from "path";
 
-import ClientManager from "./client/ClientManager.js";
-import __dirname from "./utilities/__dirname.js";
+import ClientManager from "./client/ClientManager.ts";
+import __dirname from "./utilities/__dirname.ts";
 
 if (!process.env.IS_PRODUCTION)
 	config({
@@ -25,7 +25,7 @@ const vgaInstance = ClientManager.Create(client);
 const [_, { SetupGroupCommand, DebugGroupCommand, AudioGroupCommand }] =
 	await Promise.all([
 		vgaInstance.LoadEvents(),
-		import("./client/commands/initialize.js"),
+		import("./client/commands/initialize.ts"),
 	]);
 
 vgaInstance.AddGroupCommand(SetupGroupCommand);

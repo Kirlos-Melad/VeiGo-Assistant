@@ -2,7 +2,8 @@ import {
 	ChatInputCommandInteraction,
 	SlashCommandSubcommandBuilder,
 } from "discord.js";
-import Command from "../../../classes/Command.js";
+
+import Command from "../../../classes/Command.ts";
 
 class Hello extends Command<SlashCommandSubcommandBuilder> {
 	constructor() {

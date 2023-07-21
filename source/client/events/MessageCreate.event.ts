@@ -1,8 +1,7 @@
 import { Message, Events } from "discord.js";
 
-import BotEvent from "../../classes/BotEvent.js";
-import LoggerService from "../../services/Logger.service.js";
-import Command from "../../classes/Command.js";
+import BotEvent from "../../classes/BotEvent.ts";
+import LoggerService from "../../services/Logger.service.ts";
 
 class MessageCreate extends BotEvent<Events.MessageCreate> {
 	constructor() {

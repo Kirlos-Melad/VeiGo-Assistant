@@ -1,9 +1,9 @@
 import { EmbedBuilder } from "discord.js";
 
-import AudioPlayerEvent from "../../classes/AudioEvents.js";
-import Audio from "../@types/Audio.js";
-import Queue from "../../utilities/Queue.js";
-import ServerManager from "../../core/ServerManager.js";
+import AudioPlayerEvent from "../../classes/AudioEvents.ts";
+import Audio from "../IAudio.ts";
+import Queue from "../../utilities/Queue.ts";
+import ServerManager from "../../core/ServerManager.ts";
 
 class Resume extends AudioPlayerEvent<"RESUME_AUDIO"> {
 	constructor() {

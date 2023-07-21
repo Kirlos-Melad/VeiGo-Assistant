@@ -18,13 +18,13 @@ import {
 	AudioPlayerStatus,
 	NoSubscriberBehavior,
 } from "@discordjs/voice";
+import { Awaitable } from "discord.js";
 import { TypedEmitter } from "tiny-typed-emitter";
 
 // Modules
-import Queue from "../utilities/Queue.js";
-import Audio from "./@types/Audio.js";
-import LoggerService from "../services/Logger.service.js";
-import { Awaitable } from "discord.js";
+import Queue from "../utilities/Queue.ts";
+import Audio from "./IAudio.ts";
+import LoggerService from "../services/Logger.service.ts";
 
 //! This is copied directly from the play-dl documentation as it is not exported.
 interface SearchOptions {
