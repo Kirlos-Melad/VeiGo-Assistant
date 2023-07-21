@@ -23,7 +23,7 @@ import { TypedEmitter } from "tiny-typed-emitter";
 
 // Modules
 import Queue from "../utilities/Queue.ts";
-import Audio from "./IAudio.ts";
+import Audio from "../interfaces/Audio.ts";
 import LoggerService from "../services/Logger.service.ts";
 
 //! This is copied directly from the play-dl documentation as it is not exported.

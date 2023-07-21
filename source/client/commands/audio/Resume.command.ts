@@ -3,7 +3,7 @@ import {
 	SlashCommandSubcommandBuilder,
 } from "discord.js";
 
-import Command from "../../../classes/Command.ts";
+import Command from "../../../interfaces/Command.ts";
 import ClientManager from "../../ClientManager.ts";
 
 class Resume extends Command<SlashCommandSubcommandBuilder> {

@@ -5,7 +5,7 @@ import DependencyLoader from "../../utilities/DependencyLoader.ts";
 import __dirname from "../../utilities/__dirname.ts";
 import GroupCommand from "../../core/GroupCommand.ts";
 import LoggerService from "../../services/Logger.service.ts";
-import Command from "../../classes/Command.ts";
+import Command from "../../interfaces/Command.ts";
 
 async function LoadCommands(groupCommand: GroupCommand, directory: string) {
 	const loadedEvents = await DependencyLoader(

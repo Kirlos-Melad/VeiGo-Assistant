@@ -8,7 +8,7 @@ import {
 	SlashCommandSubcommandGroupBuilder,
 } from "discord.js";
 
-import Command from "../classes/Command.ts";
+import Command from "../interfaces/Command.ts";
 
 class GroupCommand extends Command<SlashCommandBuilder> {
 	private mSubCommands: Record<

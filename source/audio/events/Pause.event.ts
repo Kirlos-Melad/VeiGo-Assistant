@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 
-import AudioPlayerEvent from "../../classes/AudioEvents.ts";
-import Audio from "../IAudio.ts";
+import AudioPlayerEvent from "../../interfaces/AudioEvents.ts";
+import Audio from "../../interfaces/Audio.ts";
 import Queue from "../../utilities/Queue.ts";
 import ServerManager from "../../core/ServerManager.ts";
 

@@ -5,7 +5,7 @@ import {
 	TextBasedChannel,
 } from "discord.js";
 
-import Command from "../../../classes/Command.ts";
+import Command from "../../../interfaces/Command.ts";
 import ClientManager from "../../ClientManager.ts";
 
 class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {

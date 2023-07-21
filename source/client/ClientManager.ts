@@ -1,12 +1,7 @@
-import {
-	Client,
-	REST,
-	Routes,
-	ClientEvents,
-} from "discord.js";
+import { Client, REST, Routes, ClientEvents } from "discord.js";
 import path from "path";
 
-import BotEvent from "../classes/BotEvent.ts";
+import BotEvent from "../interfaces/BotEvent.ts";
 import { RetryAsyncCallback } from "../utilities/RetryCallback.ts";
 import LoggerService from "../services/Logger.service.ts";
 import ServerManager from "../core/ServerManager.ts";

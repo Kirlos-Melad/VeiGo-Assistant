@@ -1,6 +1,6 @@
 import { Client, Events } from "discord.js";
 
-import BotEvent from "../../classes/BotEvent.ts";
+import BotEvent from "../../interfaces/BotEvent.ts";
 import LoggerService from "../../services/Logger.service.ts";
 
 class ClientReady extends BotEvent<Events.ClientReady> {

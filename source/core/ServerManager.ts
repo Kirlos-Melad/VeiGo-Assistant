@@ -1,13 +1,9 @@
-import {
-	CommandInteraction,
-	Guild,
-	TextBasedChannel,
-} from "discord.js";
+import { CommandInteraction, Guild, TextBasedChannel } from "discord.js";
 import { getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import path from "path";
 
 import AudioPlayer, { AudioPlayerEventKeys } from "../audio/AudioPlayer.ts";
-import AudioPlayerEvent from "../classes/AudioEvents.ts";
+import AudioPlayerEvent from "../interfaces/AudioEvents.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
 import __dirname from "../utilities/__dirname.ts";
 import LoggerService from "../services/Logger.service.ts";
@@ -20,8 +16,6 @@ class ServerManager {
 	private mAudioPlayer: AudioPlayer;
 
 	private mCommunicationChannel?: TextBasedChannel;
-
-	private mCommandInteraction?: CommandInteraction;
 
 	constructor(server: Guild) {
 		this.mServer = server;
@@ -60,16 +54,6 @@ class ServerManager {
 				LoggerService.warning(`[WARNING] An event is missing`);
 			}
 		}
-	}
-
-	public get commandInteraction(): CommandInteraction | undefined {
-		return this.mCommandInteraction;
-	}
-
-	public set commandInteraction(
-		commandInteraction: CommandInteraction | undefined,
-	) {
-		this.mCommandInteraction = commandInteraction;
 	}
 
 	public JoinVoiceChannel(channelId: string) {
