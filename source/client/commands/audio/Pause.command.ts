@@ -1,23 +1,21 @@
-import { CommandInteraction } from "discord.js";
+import {
+	ChatInputCommandInteraction,
+	SlashCommandSubcommandBuilder,
+} from "discord.js";
 import Command from "../../../classes/Command.js";
 import ClientManager from "../../ClientManager.js";
 
-class Pause extends Command {
+class Pause extends Command<SlashCommandSubcommandBuilder> {
 	constructor() {
-		super();
-
-		this.buildCommand();
+		super(
+			new SlashCommandSubcommandBuilder()
+				.setName("pause")
+				.setDescription("Pause current running audio."),
+		);
 	}
 
-	protected buildCommand() {
-		this.mCommandBuilder
-			.setName("pause")
-			.setDescription("Pause current running audio.");
-	}
-
-	async execute(interaction: CommandInteraction) {
-		interaction.reply({
-			content: "Pausing audio...",
+	async execute(interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply({
 			ephemeral: true,
 		});
 
@@ -26,18 +24,21 @@ class Pause extends Command {
 		});
 
 		if (!member?.voice.channelId) {
-			interaction.reply({
+			interaction.editReply({
 				content: "You must be in a voice channel to use this command!",
-				ephemeral: true,
 			});
 			return;
 		}
 
-		const AudioPlayerManager = ClientManager.instance.GetAudioPlayerManager(
+		interaction.editReply({
+			content: "Pausing audio...",
+		});
+
+		const serverManager = ClientManager.instance.GetServerManager(
 			interaction.guildId!,
 		);
 
-		AudioPlayerManager?.audioPlayer.Pause();
+		serverManager?.audioPlayer.Pause();
 	}
 }
 

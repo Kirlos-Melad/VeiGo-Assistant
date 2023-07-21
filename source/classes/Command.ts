@@ -1,18 +1,26 @@
 import {
-	CommandInteraction,
+	Awaitable,
+	ChatInputCommandInteraction,
 	SlashCommandBuilder,
-	EmbedBuilder,
+	SlashCommandSubcommandBuilder,
 } from "discord.js";
 
-abstract class Command {
-	protected mCommandBuilder: SlashCommandBuilder;
-	protected mEmbed?: EmbedBuilder;
+abstract class Command<
+	T extends SlashCommandBuilder | SlashCommandSubcommandBuilder,
+> {
+	protected mCommandBuilder: T;
 
-	constructor() {
-		this.mCommandBuilder = new SlashCommandBuilder();
+	constructor(builder: T) {
+		this.mCommandBuilder = builder;
 	}
 
-	public abstract execute(interaction: CommandInteraction): Promise<void>;
+	public get builder() {
+		return this.mCommandBuilder;
+	}
+
+	public abstract execute(
+		interaction: ChatInputCommandInteraction,
+	): Awaitable<void>;
 
 	public get metadata() {
 		return this.mCommandBuilder.toJSON();

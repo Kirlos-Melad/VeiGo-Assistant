@@ -1,20 +1,27 @@
-import { Client, REST, Routes, ClientEvents } from "discord.js";
+import {
+	Client,
+	REST,
+	Routes,
+	ClientEvents,
+	ChannelType,
+	SlashCommandBuilder,
+} from "discord.js";
 import path from "path";
 
 import BotEvent from "../classes/BotEvent.js";
-import Command from "../classes/Command.js";
 import { RetryAsyncCallback } from "../utilities/RetryCallback.js";
 import LoggerService from "../services/Logger.service.js";
-import AudioPlayerManager from "../audio/AudioPlayerManager.js";
+import ServerManager from "../core/ServerManager.js";
 import DependencyLoader from "../utilities/DependencyLoader.js";
 import __dirname from "../utilities/__dirname.js";
+import GroupCommand from "../core/GroupCommand.js";
 
 class ClientManager {
 	private static mInstance: ClientManager;
 
 	private mDiscordClient: Client;
-	private mCommands: Record<string, Command>;
-	private mServers: Record<string, AudioPlayerManager>;
+	private mCommands: Record<string, GroupCommand>;
+	private mServers: Record<string, ServerManager>;
 
 	private constructor(discordClient: Client) {
 		this.mDiscordClient = discordClient;
@@ -63,26 +70,8 @@ class ClientManager {
 		}
 	}
 
-	private AddCommand(command: Command) {
-		this.mCommands[command.metadata.name] = command;
-	}
-
-	public async LoadCommands() {
-		const loadedEvents = await DependencyLoader(
-			path.join(__dirname(import.meta.url), "commands"),
-			true,
-		);
-
-		for (const { default: command } of loadedEvents) {
-			if (command instanceof Command) {
-				LoggerService.information(
-					`Loaded command ${command.metadata.name}`,
-				);
-				this.AddCommand(command);
-			} else {
-				LoggerService.warning(`[WARNING] A command is missing`);
-			}
-		}
+	public AddGroupCommand(groupCommand: GroupCommand) {
+		this.mCommands[groupCommand.metadata.name] = groupCommand;
 	}
 
 	public async UpdateCommands() {
@@ -104,7 +93,7 @@ class ClientManager {
 		});
 	}
 
-	public GetAudioPlayerManager(serverId: string) {
+	public GetServerManager(serverId: string) {
 		return this.mServers[serverId];
 	}
 
@@ -114,10 +103,7 @@ class ClientManager {
 		});
 
 		this.mDiscordClient.guilds.cache.forEach((guild) => {
-			this.mServers[guild.id] = new AudioPlayerManager(
-				guild.id,
-				guild.voiceAdapterCreator,
-			);
+			this.mServers[guild.id] = new ServerManager(guild);
 		});
 
 		await Promise.all(

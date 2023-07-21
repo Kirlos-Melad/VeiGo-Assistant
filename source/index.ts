@@ -22,7 +22,15 @@ const client = new Client({
 });
 
 const vgaInstance = ClientManager.Create(client);
-await Promise.all([vgaInstance.LoadEvents(), vgaInstance.LoadCommands()]);
+const [_, { SetupGroupCommand, DebugGroupCommand, AudioGroupCommand }] =
+	await Promise.all([
+		vgaInstance.LoadEvents(),
+		import("./client/commands/initialize.js"),
+	]);
+
+vgaInstance.AddGroupCommand(SetupGroupCommand);
+vgaInstance.AddGroupCommand(DebugGroupCommand);
+vgaInstance.AddGroupCommand(AudioGroupCommand);
 await vgaInstance.UpdateCommands();
 
 await vgaInstance.Run();

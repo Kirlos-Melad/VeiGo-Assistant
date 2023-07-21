@@ -23,8 +23,8 @@ import { TypedEmitter } from "tiny-typed-emitter";
 // Modules
 import Queue from "../utilities/Queue.js";
 import Audio from "./@types/Audio.js";
-import { AudioPlayerEventHandlers } from "./AudioPlayerEvent.js";
 import LoggerService from "../services/Logger.service.js";
+import { Awaitable } from "discord.js";
 
 //! This is copied directly from the play-dl documentation as it is not exported.
 interface SearchOptions {
@@ -43,6 +43,37 @@ interface SearchOptions {
 	 */
 	unblurNSFWThumbnails?: boolean;
 }
+
+type AudioPlayerEvents = {
+	SEARCH_AUDIO: [
+		query: string,
+		results: Array<YouTube | SoundCloud | Spotify | Deezer>,
+	];
+
+	ADD_AUDIO: [queue: Queue<Audio>, audio: Audio];
+
+	PLAY_AUDIO: [queue: Queue<Audio>, audio: Audio];
+	FINISH_AUDIO: [queue: Queue<Audio>, audio: Audio];
+
+	SKIP_AUDIO: [queue: Queue<Audio>, audio: Audio];
+
+	PAUSE_AUDIO: [queue: Queue<Audio>, audio: Audio];
+	RESUME_AUDIO: [queue: Queue<Audio>, audio: Audio];
+
+	EMPTY_QUEUE: [queue: Queue<Audio>];
+
+	DESTROY_QUEUE: [queue: Queue<Audio>];
+
+	ERROR: [error: any];
+};
+
+type AudioPlayerEventKeys = keyof AudioPlayerEvents;
+
+type AudioPlayerEventHandlers = {
+	[K in AudioPlayerEventKeys]: (
+		...args: AudioPlayerEvents[K]
+	) => Awaitable<void>;
+};
 
 class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 	private mQueue: Queue<Audio>;
@@ -82,7 +113,7 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 
 		player.on("unsubscribe", (subscription) => {
 			this.emit("DESTROY_QUEUE", this.mQueue);
-			this.mPlayer.stop();
+			this.mPlayer.stop(true);
 			this.mQueue.Clear();
 		});
 
@@ -215,6 +246,11 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 			this.emit("RESUME_AUDIO", this.mQueue, this.mQueue.First());
 	}
 
+	public Stop() {
+		this.mPlayer.stop(true);
+		this.mQueue.Clear();
+	}
+
 	/**
 	 * @returns DiscordAudioPlayer instance
 	 */
@@ -224,3 +260,4 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 }
 
 export default AudioPlayer;
+export { AudioPlayerEventKeys, AudioPlayerEventHandlers };

@@ -1,30 +1,26 @@
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from "discord.js";
 import Command from "../../../classes/Command.js";
 import ClientManager from "../../ClientManager.js";
 
-class Play extends Command {
+class Play extends Command<SlashCommandSubcommandBuilder> {
 	constructor() {
-		super();
+		super(
+			new SlashCommandSubcommandBuilder()
+				.setName("play")
+				.setDescription("Plays audio"),
+		);
 
-		this.buildCommand();
+		this.mCommandBuilder.addStringOption((option) =>
+			option
+				.setName("value")
+				.setDescription("A search query or URL")
+				.setRequired(true),
+		);
 	}
 
-	protected buildCommand() {
-		this.mCommandBuilder
-			.setName("play")
-			.setDescription("Plays audio")
-			.addStringOption((option) => {
-				option.setName("value");
-				option.setDescription("A search query or URL");
-				option.setRequired(true);
-				return option;
-			});
-	}
-
-	async execute(interaction: CommandInteraction) {
-		interaction.deferReply({
+	async execute(interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply({
 			ephemeral: true,
-			fetchReply: true,
 		});
 
 		const member = await interaction.guild?.members.fetch({
@@ -32,22 +28,22 @@ class Play extends Command {
 		});
 
 		if (!member?.voice.channelId) {
-			interaction.reply({
+			interaction.editReply({
 				content: "You must be in a voice channel to use this command!",
-				ephemeral: true,
 			});
 			return;
 		}
 
-		const AudioPlayerManager = ClientManager.instance.GetAudioPlayerManager(
+		const serverManager = ClientManager.instance.GetServerManager(
 			interaction.guildId!,
 		);
-		AudioPlayerManager?.SetContext({
-			textChannel: interaction.channel ?? null,
-			editReply: interaction.editReply.bind(interaction),
+
+		interaction.editReply({
+			content: "Playing audio...",
 		});
-		AudioPlayerManager?.JoinVoiceChannel(member.voice.channelId);
-		AudioPlayerManager?.audioPlayer.Play(
+
+		serverManager?.JoinVoiceChannel(member.voice.channelId);
+		serverManager?.audioPlayer.Play(
 			interaction.options.get("value")!.value as string,
 		);
 	}

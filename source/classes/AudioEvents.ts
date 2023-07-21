@@ -1,7 +1,5 @@
-import {
-	AudioPlayerEventKeys,
-	AudioPlayerEventHandlers,
-} from "../audio/AudioPlayerEvent";
+import { AudioPlayerEventHandlers, AudioPlayerEventKeys } from "../audio/AudioPlayer";
+
 
 abstract class AudioPlayerEvent<T extends AudioPlayerEventKeys> {
 	protected mName: T;

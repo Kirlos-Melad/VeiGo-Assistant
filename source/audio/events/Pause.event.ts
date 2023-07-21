@@ -3,22 +3,21 @@ import { EmbedBuilder } from "discord.js";
 import AudioPlayerEvent from "../../classes/AudioEvents.js";
 import Audio from "../@types/Audio.js";
 import Queue from "../../utilities/Queue.js";
-import AudioPlayerManager from "../AudioPlayerManager.js";
+import ServerManager from "../../core/ServerManager.js";
 
 class Pause extends AudioPlayerEvent<"PAUSE_AUDIO"> {
 	constructor() {
 		super("PAUSE_AUDIO");
 	}
 
-	public listener(context: AudioPlayerManager) {
+	public listener(context: ServerManager) {
 		return (queue: Queue<Audio>, audio: Audio) => {
-			const { textChannel } = context.GetContext();
-			if (!textChannel) return;
-
 			const embed = new EmbedBuilder();
 
 			embed.setTitle("Audio Paused");
-			embed.setDescription(`⏸️ Paused: **[${audio.name}](${audio.url})**`);
+			embed.setDescription(
+				`⏸️ Paused: **[${audio.name}](${audio.url})**`,
+			);
 			embed.setThumbnail(audio.thumbnail);
 			embed
 				.addFields([
@@ -34,7 +33,7 @@ class Pause extends AudioPlayerEvent<"PAUSE_AUDIO"> {
 						"https://avatars.githubusercontent.com/u/52179817?v=4",
 				});
 
-			textChannel.send({ embeds: [embed] });
+			context.communicationChannel?.send({ embeds: [embed] });
 		};
 	}
 }

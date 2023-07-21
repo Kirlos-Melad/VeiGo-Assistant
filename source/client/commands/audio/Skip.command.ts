@@ -1,23 +1,21 @@
-import { CommandInteraction } from "discord.js";
+import {
+	ChatInputCommandInteraction,
+	SlashCommandSubcommandBuilder,
+} from "discord.js";
 import Command from "../../../classes/Command.js";
 import ClientManager from "../../ClientManager.js";
 
-class Skip extends Command {
+class Skip extends Command<SlashCommandSubcommandBuilder> {
 	constructor() {
-		super();
-
-		this.buildCommand();
+		super(
+			new SlashCommandSubcommandBuilder()
+				.setName("skip")
+				.setDescription("Skip current running audio."),
+		);
 	}
 
-	protected buildCommand() {
-		this.mCommandBuilder
-			.setName("skip")
-			.setDescription("Skip current running audio.");
-	}
-
-	async execute(interaction: CommandInteraction) {
-		interaction.reply({
-			content: "Skipping audio...",
+	async execute(interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply({
 			ephemeral: true,
 		});
 
@@ -26,18 +24,21 @@ class Skip extends Command {
 		});
 
 		if (!member?.voice.channelId) {
-			interaction.reply({
+			interaction.editReply({
 				content: "You must be in a voice channel to use this command!",
-				ephemeral: true,
 			});
 			return;
 		}
 
-		const AudioPlayerManager = ClientManager.instance.GetAudioPlayerManager(
+		interaction.editReply({
+			content: "Skipping audio...",
+		});
+
+		const serverManager = ClientManager.instance.GetServerManager(
 			interaction.guildId!,
 		);
 
-		AudioPlayerManager?.audioPlayer.Skip();
+		serverManager?.audioPlayer.Skip();
 	}
 }
 
