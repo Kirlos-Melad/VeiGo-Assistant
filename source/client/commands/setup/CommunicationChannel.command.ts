@@ -30,13 +30,18 @@ class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
 			interaction.guildId!,
 		);
 
-		interaction.editReply({
-			content: "Setting up communication channel...",
+		const channel = interaction.options.get("channel")!
+			.channel as TextBasedChannel;
+
+		await interaction.editReply({
+			content: `Setting up communication channel to ${channel}!`,
 		});
 
-		serverManager!.communicationChannel =
-			(interaction.options.get("channel")?.channel as TextBasedChannel) ??
-			undefined;
+		serverManager!.communicationChannel = channel;
+
+		serverManager!.communicationChannel.send(
+			`Communication channel is set successfully to ${channel}!`,
+		);
 	}
 }
 
