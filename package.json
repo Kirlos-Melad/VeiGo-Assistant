@@ -4,6 +4,9 @@
   "description": "Discord Bot Named VeiGo",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": "==18.0.0"
+  },
   "scripts": {
     "start": "ts-node --esm --transpile-only ./source/index.ts",
     "start:watch": "nodemon -L --exec ts-node --esm ./source/index.ts",

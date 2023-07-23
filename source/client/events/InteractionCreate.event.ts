@@ -21,37 +21,39 @@ class InteractionCreate extends BotEvent<Events.InteractionCreate> {
 		return async (interaction: Interaction<CacheType>) => {
 			if (!interaction.isChatInputCommand()) return;
 
-			if (!interaction.guildId) {
-				await interaction.reply({
-					content: "I can only be used in a server!",
-					ephemeral: true,
-				});
-				return;
-			}
-
-			if (!ClientManager.instance.GetServerManager(interaction.guildId)) {
-				await interaction.reply({
-					content: "I am not setup in this server yet!",
-					ephemeral: true,
-				});
-				return;
-			}
-
-			const { commands } = context;
-			const command = commands[interaction.commandName];
-
-			if (!command) {
-				await interaction.reply({
-					content: "Command not found!",
-					ephemeral: true,
-				});
-				return;
-			}
-
 			try {
 				await interaction.deferReply({
 					ephemeral: true,
 				});
+
+				if (!interaction.guildId) {
+					await interaction.editReply({
+						content: "I can only be used in a server!",
+					});
+					return;
+				}
+
+				if (
+					!ClientManager.instance.GetServerManager(
+						interaction.guildId,
+					)
+				) {
+					await interaction.editReply({
+						content: "I am not setup in this server yet!",
+					});
+					return;
+				}
+
+				const { commands } = context;
+				const command = commands[interaction.commandName];
+
+				if (!command) {
+					await interaction.reply({
+						content: "Command not found!",
+						ephemeral: true,
+					});
+					return;
+				}
 
 				await command.execute(interaction);
 			} catch (error) {
@@ -59,16 +61,16 @@ class InteractionCreate extends BotEvent<Events.InteractionCreate> {
 
 				if (interaction.replied) {
 					await interaction.followUp({
-						content: `There was an error while executing ${command.metadata.name}`,
+						content: `There was an error while executing ${interaction.commandName}`,
 						ephemeral: true,
 					});
 				} else if (interaction.deferred) {
 					await interaction.editReply({
-						content: `There was an error while executing ${command.metadata.name}`,
+						content: `There was an error while executing ${interaction.commandName}`,
 					});
 				} else {
 					await interaction.reply({
-						content: `There was an error while executing ${command.metadata.name}`,
+						content: `There was an error while executing ${interaction.commandName}`,
 						ephemeral: true,
 					});
 				}
