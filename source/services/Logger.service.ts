@@ -72,6 +72,20 @@ class LoggerService {
 	}
 
 	public error(message: unknown) {
+		message =
+			message instanceof Error
+				? JSON.stringify(
+						{
+							name: message.name,
+							message: message.message,
+							stack: message.stack,
+							cause: message.cause,
+						},
+						null,
+						"\t",
+				  ).replace(/\\n/g, "\n\t\t")
+				: message;
+
 		this.mLogger.log("ERROR", message);
 	}
 }
