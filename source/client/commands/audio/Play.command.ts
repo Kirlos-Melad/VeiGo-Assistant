@@ -1,6 +1,9 @@
-import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from "discord.js";
+import {
+	ChatInputCommandInteraction,
+	SlashCommandSubcommandBuilder,
+} from "discord.js";
 
-import Command from "../../../classes/Command.ts";
+import Command from "../../../base/Command.ts";
 import ClientManager from "../../ClientManager.ts";
 
 class Play extends Command<SlashCommandSubcommandBuilder> {
@@ -31,7 +34,7 @@ class Play extends Command<SlashCommandSubcommandBuilder> {
 			return;
 		}
 
-		const serverManager = ClientManager.instance.GetServerManager(
+		const GuildManager = ClientManager.instance.GetGuildManager(
 			interaction.guildId!,
 		);
 
@@ -39,8 +42,8 @@ class Play extends Command<SlashCommandSubcommandBuilder> {
 			content: "Playing audio...",
 		});
 
-		serverManager?.JoinVoiceChannel(member.voice.channelId);
-		serverManager?.audioPlayer.Play(
+		GuildManager?.JoinVoiceChannel(member.voice.channelId);
+		GuildManager?.audioPlayer.Play(
 			interaction.options.get("value")!.value as string,
 		);
 	}

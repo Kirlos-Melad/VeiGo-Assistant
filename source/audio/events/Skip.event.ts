@@ -1,16 +1,16 @@
 import { EmbedBuilder } from "discord.js";
 
-import AudioPlayerEvent from "../../classes/AudioEvents.ts";
-import Audio from "../IAudio.ts";
+import AudioPlayerEvent from "../../base/AudioEvents.ts";
+import { Audio } from "../AudioPlayer.ts";
 import Queue from "../../utilities/Queue.ts";
-import ServerManager from "../../core/ServerManager.ts";
+import GuildManager from "../../base/GuildManager.ts";
 
 class Add extends AudioPlayerEvent<"SKIP_AUDIO"> {
 	constructor() {
 		super("SKIP_AUDIO");
 	}
 
-	public listener(context: ServerManager) {
+	public listener(context: GuildManager) {
 		return (queue: Queue<Audio>, audio: Audio) => {
 			const embed = new EmbedBuilder()
 				.setTitle("Audio Skipped")
@@ -23,11 +23,7 @@ class Add extends AudioPlayerEvent<"SKIP_AUDIO"> {
 						inline: true,
 					},
 				])
-				.setFooter({
-					text: "Developed by Veigo 😎🔥",
-					iconURL:
-						"https://avatars.githubusercontent.com/u/52179817?v=4",
-				});
+				.setFooter(this.mEmbedFooterOptions);
 
 			context.communicationChannel?.send({ embeds: [embed] });
 		};

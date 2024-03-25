@@ -3,7 +3,7 @@ import {
 	SlashCommandSubcommandBuilder,
 } from "discord.js";
 
-import Command from "../../../classes/Command.ts";
+import Command from "../../../base/Command.ts";
 
 class Hello extends Command<SlashCommandSubcommandBuilder> {
 	constructor() {

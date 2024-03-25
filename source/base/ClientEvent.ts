@@ -1,6 +1,6 @@
 import { ClientEvents, Awaitable } from "discord.js";
 
-abstract class BotEvent<T extends keyof ClientEvents> {
+abstract class ClientEvent<T extends keyof ClientEvents> {
 	protected mName: T;
 
 	constructor(name: T) {
@@ -16,4 +16,4 @@ abstract class BotEvent<T extends keyof ClientEvents> {
 	}
 }
 
-export default BotEvent;
+export default ClientEvent;

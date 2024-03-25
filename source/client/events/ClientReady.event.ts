@@ -1,16 +1,16 @@
 import { Client, Events } from "discord.js";
 
-import BotEvent from "../../classes/BotEvent.ts";
-import LoggerService from "../../services/Logger.service.ts";
+import ClientEvent from "../../base/ClientEvent.ts";
+import Logger from "../../utilities/Logger.ts";
 
-class ClientReady extends BotEvent<Events.ClientReady> {
+class ClientReady extends ClientEvent<Events.ClientReady> {
 	constructor() {
 		super(Events.ClientReady);
 	}
 
 	public listener(context: unknown) {
 		return (client: Client<boolean>) => {
-			LoggerService.information(`${client.user?.username} is online!`);
+			Logger.information(`${client.user?.username} is online!`);
 		};
 	}
 }

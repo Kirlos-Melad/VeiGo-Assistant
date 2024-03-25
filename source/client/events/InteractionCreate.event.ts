@@ -5,12 +5,12 @@ import {
 	SlashCommandBuilder,
 } from "discord.js";
 
-import BotEvent from "../../classes/BotEvent.ts";
-import LoggerService from "../../services/Logger.service.ts";
-import Command from "../../classes/Command.ts";
+import ClientEvent from "../../base/ClientEvent.ts";
+import Logger from "../../utilities/Logger.ts";
+import Command from "../../base/Command.ts";
 import ClientManager from "../ClientManager.ts";
 
-class InteractionCreate extends BotEvent<Events.InteractionCreate> {
+class InteractionCreate extends ClientEvent<Events.InteractionCreate> {
 	constructor() {
 		super(Events.InteractionCreate);
 	}
@@ -34,9 +34,7 @@ class InteractionCreate extends BotEvent<Events.InteractionCreate> {
 				}
 
 				if (
-					!ClientManager.instance.GetServerManager(
-						interaction.guildId,
-					)
+					!ClientManager.instance.GetGuildManager(interaction.guildId)
 				) {
 					await interaction.editReply({
 						content: "I am not setup in this server yet!",
@@ -57,7 +55,7 @@ class InteractionCreate extends BotEvent<Events.InteractionCreate> {
 
 				await command.execute(interaction);
 			} catch (error) {
-				LoggerService.error(error);
+				Logger.error(error);
 
 				if (interaction.replied) {
 					await interaction.followUp({

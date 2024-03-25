@@ -1,9 +1,9 @@
 import { Message, Events } from "discord.js";
 
-import BotEvent from "../../classes/BotEvent.ts";
-import LoggerService from "../../services/Logger.service.ts";
+import ClientEvent from "../../base/ClientEvent.ts";
+import Logger from "../../utilities/Logger.ts";
 
-class MessageCreate extends BotEvent<Events.MessageCreate> {
+class MessageCreate extends ClientEvent<Events.MessageCreate> {
 	constructor() {
 		super(Events.MessageCreate);
 	}
@@ -12,7 +12,7 @@ class MessageCreate extends BotEvent<Events.MessageCreate> {
 		return (message: Message<boolean>) => {
 			if (message.author.bot) return;
 
-			LoggerService.information(`User sent: ${message.content}`);
+			Logger.information(`User sent: ${message.content}`);
 
 			return;
 		};

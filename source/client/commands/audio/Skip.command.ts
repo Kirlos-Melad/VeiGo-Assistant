@@ -3,7 +3,7 @@ import {
 	SlashCommandSubcommandBuilder,
 } from "discord.js";
 
-import Command from "../../../classes/Command.ts";
+import Command from "../../../base/Command.ts";
 import ClientManager from "../../ClientManager.ts";
 
 class Skip extends Command<SlashCommandSubcommandBuilder> {
@@ -31,11 +31,11 @@ class Skip extends Command<SlashCommandSubcommandBuilder> {
 			content: "Skipping audio...",
 		});
 
-		const serverManager = ClientManager.instance.GetServerManager(
+		const GuildManager = ClientManager.instance.GetGuildManager(
 			interaction.guildId!,
 		);
 
-		serverManager?.audioPlayer.Skip();
+		GuildManager?.audioPlayer.Skip();
 	}
 }
 

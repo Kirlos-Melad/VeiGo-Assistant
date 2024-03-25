@@ -25,7 +25,7 @@ const vgaInstance = ClientManager.Create(client);
 const [_, { SetupGroupCommand, DebugGroupCommand, AudioGroupCommand }] =
 	await Promise.all([
 		vgaInstance.LoadEvents(),
-		import("./client/commands/initialize.ts"),
+		import("./client/commands/initialize.commands.ts"),
 	]);
 
 vgaInstance.AddGroupCommand(SetupGroupCommand);

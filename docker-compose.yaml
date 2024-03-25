@@ -1,13 +1,11 @@
+name: "veigo assistant"
+
 services:
-  app:
-    build: .
-    container_name: "vga-instance"
+  server:
+    container_name: ${SERVER_CONTAINER_NAME}
     ports:
-      - "80:8888"
+      - "${SERVER_HOST_PORT}:${SERVER_CONTAINER_PORT}"
     env_file:
       - .env
     volumes:
-      - ./source:/app/source # this is a volume to allow hot reloading
-      #- ./package.json:/app/package.json
-      #- ./node_modules:/app/node_modules
-      #- /app/node_modules # this is a volume to prevent node_modules from being overwritten by the volume above
+      - ${SERVER_VOLUME}:/app/source

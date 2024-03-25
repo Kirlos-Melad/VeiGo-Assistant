@@ -3,9 +3,9 @@ import { SlashCommandBuilder } from "discord.js";
 
 import DependencyLoader from "../../utilities/DependencyLoader.ts";
 import __dirname from "../../utilities/__dirname.ts";
-import GroupCommand from "../../core/GroupCommand.ts";
-import LoggerService from "../../services/Logger.service.ts";
-import Command from "../../classes/Command.ts";
+import GroupCommand from "../../base/GroupCommand.ts";
+import Logger from "../../utilities/Logger.ts";
+import Command from "../../base/Command.ts";
 
 async function LoadCommands(groupCommand: GroupCommand, directory: string) {
 	const loadedEvents = await DependencyLoader(
@@ -15,12 +15,12 @@ async function LoadCommands(groupCommand: GroupCommand, directory: string) {
 
 	for (const { default: subCommand } of loadedEvents) {
 		if (subCommand instanceof Command) {
-			LoggerService.information(
+			Logger.information(
 				`Loaded sub-command ${subCommand.metadata.name} of group command ${groupCommand.metadata.name}`,
 			);
 			groupCommand.AddSubCommand(subCommand);
 		} else {
-			LoggerService.warning(`Sub-command is missing`);
+			Logger.warning(`Sub-command is missing`);
 		}
 	}
 }

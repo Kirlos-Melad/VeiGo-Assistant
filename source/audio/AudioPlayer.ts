@@ -23,8 +23,7 @@ import { TypedEmitter } from "tiny-typed-emitter";
 
 // Modules
 import Queue from "../utilities/Queue.ts";
-import Audio from "./IAudio.ts";
-import LoggerService from "../services/Logger.service.ts";
+import Logger from "../utilities/Logger.ts";
 
 //! This is copied directly from the play-dl documentation as it is not exported.
 interface SearchOptions {
@@ -43,6 +42,13 @@ interface SearchOptions {
 	 */
 	unblurNSFWThumbnails?: boolean;
 }
+
+type Audio = {
+	url: string;
+	name: string;
+	thumbnail: string;
+	duration: string;
+};
 
 type AudioPlayerEvents = {
 	SEARCH_AUDIO: [
@@ -118,7 +124,7 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 		});
 
 		player.on("debug", (message) => {
-			LoggerService.information(message);
+			Logger.information(message);
 		});
 
 		return player;
@@ -260,4 +266,4 @@ class AudioPlayer extends TypedEmitter<AudioPlayerEventHandlers> {
 }
 
 export default AudioPlayer;
-export { AudioPlayerEventKeys, AudioPlayerEventHandlers };
+export { Audio, AudioPlayerEventKeys, AudioPlayerEventHandlers };
