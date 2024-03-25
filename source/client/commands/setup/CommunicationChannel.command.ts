@@ -5,7 +5,7 @@ import {
 	TextBasedChannel,
 } from "discord.js";
 
-import Command from "../../../interfaces/Command.ts";
+import Command from "../../../base/Command.ts";
 import ClientManager from "../../ClientManager.ts";
 
 class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
@@ -26,7 +26,7 @@ class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
 	}
 
 	public async execute(interaction: ChatInputCommandInteraction) {
-		const serverManager = ClientManager.instance.GetServerManager(
+		const GuildManager = ClientManager.instance.GetGuildManager(
 			interaction.guildId!,
 		);
 
@@ -37,9 +37,9 @@ class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
 			content: `Setting up communication channel to ${channel}!`,
 		});
 
-		serverManager!.communicationChannel = channel;
+		GuildManager!.communicationChannel = channel;
 
-		serverManager!.communicationChannel.send(
+		GuildManager!.communicationChannel.send(
 			`Communication channel is set successfully to ${channel}!`,
 		);
 	}

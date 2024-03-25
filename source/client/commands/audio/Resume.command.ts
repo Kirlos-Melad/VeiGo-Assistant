@@ -3,7 +3,7 @@ import {
 	SlashCommandSubcommandBuilder,
 } from "discord.js";
 
-import Command from "../../../interfaces/Command.ts";
+import Command from "../../../base/Command.ts";
 import ClientManager from "../../ClientManager.ts";
 
 class Resume extends Command<SlashCommandSubcommandBuilder> {
@@ -31,11 +31,11 @@ class Resume extends Command<SlashCommandSubcommandBuilder> {
 			content: "Resuming audio...",
 		});
 
-		const serverManager = ClientManager.instance.GetServerManager(
+		const GuildManager = ClientManager.instance.GetGuildManager(
 			interaction.guildId!,
 		);
 
-		serverManager?.audioPlayer.Resume();
+		GuildManager?.audioPlayer.Resume();
 	}
 }
 

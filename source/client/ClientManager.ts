@@ -1,20 +1,27 @@
-import { Client, REST, Routes, ClientEvents } from "discord.js";
+import {
+	Client,
+	REST,
+	Routes,
+	ClientEvents,
+	TextBasedChannel,
+} from "discord.js";
 import path from "path";
 
-import BotEvent from "../interfaces/BotEvent.ts";
+import ClientEvent from "../base/ClientEvent.ts";
 import { RetryAsyncCallback } from "../utilities/RetryCallback.ts";
-import LoggerService from "../services/Logger.service.ts";
-import ServerManager from "../core/ServerManager.ts";
+import Logger from "../utilities/Logger.ts";
+import GuildManager from "../base/GuildManager.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
 import __dirname from "../utilities/__dirname.ts";
-import GroupCommand from "../core/GroupCommand.ts";
+import GroupCommand from "../base/GroupCommand.ts";
+import AudioPlayer from "../audio/AudioPlayer.ts";
 
 class ClientManager {
 	private static mInstance: ClientManager;
 
 	private mDiscordClient: Client;
 	private mCommands: Record<string, GroupCommand>;
-	private mServers: Record<string, ServerManager>;
+	private mServers: Record<string, GuildManager>;
 
 	private constructor(discordClient: Client) {
 		this.mDiscordClient = discordClient;
@@ -26,7 +33,7 @@ class ClientManager {
 		if (!ClientManager.mInstance) {
 			ClientManager.mInstance = new ClientManager(discordClient);
 		} else {
-			LoggerService.warning("[WARNING] Bot has already been created");
+			Logger.warning("Bot has already been created");
 		}
 
 		return ClientManager.mInstance;
@@ -40,7 +47,9 @@ class ClientManager {
 		return ClientManager.mInstance;
 	}
 
-	private AddEvent<T extends keyof ClientEvents>(event: BotEvent<T>): void {
+	private AddEvent<T extends keyof ClientEvents>(
+		event: ClientEvent<T>,
+	): void {
 		this.mDiscordClient.on(
 			event.name,
 			event.listener({ commands: this.mCommands }),
@@ -54,11 +63,11 @@ class ClientManager {
 		);
 
 		for (const { default: event } of loadedEvents) {
-			if (event instanceof BotEvent) {
-				LoggerService.information(`Loaded event ${event.name}`);
+			if (event instanceof ClientEvent) {
+				Logger.information(`Loaded event ${event.name}`);
 				this.AddEvent(event);
 			} else {
-				LoggerService.warning(`[WARNING] An event is missing`);
+				Logger.warning(`An event is missing`);
 			}
 		}
 	}
@@ -86,7 +95,7 @@ class ClientManager {
 		});
 	}
 
-	public GetServerManager(serverId: string) {
+	public GetGuildManager(serverId: string) {
 		return this.mServers[serverId];
 	}
 
@@ -95,16 +104,25 @@ class ClientManager {
 			await this.mDiscordClient.login(process.env.CLIENT_TOKEN);
 		});
 
-		this.mDiscordClient.guilds.cache.forEach((guild) => {
-			this.mServers[guild.id] = new ServerManager(guild);
-		});
+		for (const guild of this.mDiscordClient.guilds.cache.values()) {
+			const g = { id: guild.id, communicationChannelId: null };
+
+			// Create the guild manager
+			this.mServers[guild.id] = new GuildManager(
+				guild,
+				new AudioPlayer(),
+				{
+					communicationChannelId: g.communicationChannelId,
+				},
+			);
+		}
 
 		await Promise.all(
 			Object.values(this.mServers).map((server) => server.LoadEvents()),
 		);
 
 		console.clear();
-		LoggerService.information(
+		Logger.information(
 			`${this.mDiscordClient.user?.username} is ready to go!`,
 		);
 	}

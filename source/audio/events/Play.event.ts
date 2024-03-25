@@ -1,25 +1,21 @@
 import { EmbedBuilder } from "discord.js";
 
-import AudioPlayerEvent from "../../interfaces/AudioEvents.ts";
-import Audio from "../../interfaces/Audio.ts";
+import AudioPlayerEvent from "../../base/AudioEvents.ts";
+import { Audio } from "../AudioPlayer.ts";
 import Queue from "../../utilities/Queue.ts";
-import ServerManager from "../../core/ServerManager.ts";
+import GuildManager from "../../base/GuildManager.ts";
 
 class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
 	constructor() {
 		super("PLAY_AUDIO");
 	}
 
-	public listener(context: ServerManager) {
+	public listener(context: GuildManager) {
 		return (queue: Queue<Audio>, audio: Audio) => {
-			const embed = new EmbedBuilder();
-
-			embed.setTitle("Now Playing");
-			embed.setDescription(
-				`🎶 Playing: **[${audio.name}](${audio.url})**`,
-			);
-			embed.setThumbnail(audio.thumbnail);
-			embed
+			const embed = new EmbedBuilder()
+				.setTitle("Now Playing")
+				.setDescription(`🎶 Playing: **[${audio.name}](${audio.url})**`)
+				.setThumbnail(audio.thumbnail)
 				.addFields([
 					{
 						name: "Duration",
@@ -27,11 +23,7 @@ class Play extends AudioPlayerEvent<"PLAY_AUDIO"> {
 						inline: true,
 					},
 				])
-				.setFooter({
-					text: "Developed by Veigo 😎🔥",
-					iconURL:
-						"https://avatars.githubusercontent.com/u/52179817?v=4",
-				});
+				.setFooter(this.mEmbedFooterOptions);
 
 			context.communicationChannel?.send({ embeds: [embed] });
 		};

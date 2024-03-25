@@ -1,36 +1,54 @@
-import { CommandInteraction, Guild, TextBasedChannel } from "discord.js";
+import { Guild, TextBasedChannel } from "discord.js";
 import { getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import path from "path";
 
 import AudioPlayer, { AudioPlayerEventKeys } from "../audio/AudioPlayer.ts";
-import AudioPlayerEvent from "../interfaces/AudioEvents.ts";
+import AudioPlayerEvent from "./AudioEvents.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
 import __dirname from "../utilities/__dirname.ts";
-import LoggerService from "../services/Logger.service.ts";
+import Logger from "../utilities/Logger.ts";
 
-class ServerManager {
-	private mServer: Guild;
+type GuildConfigurations = {
+	communicationChannelId?: string | null;
+};
 
-	// private mServerId: string;
+class GuildManager {
+	private mGuild: Guild;
+
+	// private mGuildId: string;
 	// private mAdapterCreator: InternalDiscordGatewayAdapterCreator;
 	private mAudioPlayer: AudioPlayer;
 
-	private mCommunicationChannel?: TextBasedChannel;
+	private mCommunicationChannel: TextBasedChannel | null;
 
-	constructor(server: Guild) {
-		this.mServer = server;
-		this.mAudioPlayer = new AudioPlayer();
+	constructor(
+		guild: Guild,
+		audioPlayer: AudioPlayer,
+		configurations: GuildConfigurations = {},
+	) {
+		this.mGuild = guild;
+		this.mAudioPlayer = audioPlayer;
+
+		const { communicationChannelId } = configurations;
+
+		const communicationChannel = communicationChannelId
+			? (guild.channels.cache.get(
+					communicationChannelId,
+			  ) as TextBasedChannel)
+			: null;
+
+		this.mCommunicationChannel = communicationChannel ?? null;
 	}
 
 	public get audioPlayer() {
 		return this.mAudioPlayer;
 	}
 
-	public get communicationChannel() {
+	public get communicationChannel(): TextBasedChannel | null {
 		return this.mCommunicationChannel;
 	}
 
-	public set communicationChannel(channel: TextBasedChannel | undefined) {
+	public set communicationChannel(channel: TextBasedChannel | null) {
 		this.mCommunicationChannel = channel;
 	}
 
@@ -48,19 +66,19 @@ class ServerManager {
 
 		for (const { default: event } of loadedEvents) {
 			if (event instanceof AudioPlayerEvent) {
-				LoggerService.information(`Loaded event ${event.name}`);
+				Logger.information(`Loaded event ${event.name}`);
 				this.AddEvent(event);
 			} else {
-				LoggerService.warning(`[WARNING] An event is missing`);
+				Logger.warning(`An event is missing`);
 			}
 		}
 	}
 
 	public JoinVoiceChannel(channelId: string) {
 		const connection = joinVoiceChannel({
-			guildId: this.mServer.id,
+			guildId: this.mGuild.id,
 			channelId: channelId,
-			adapterCreator: this.mServer.voiceAdapterCreator,
+			adapterCreator: this.mGuild.voiceAdapterCreator,
 		});
 
 		connection.subscribe(this.mAudioPlayer.player);
@@ -72,10 +90,11 @@ class ServerManager {
 	}
 
 	public DisconnectFromVoiceChannel() {
-		const connection = getVoiceConnection(this.mServer.id);
+		const connection = getVoiceConnection(this.mGuild.id);
 
 		connection?.destroy();
 	}
 }
 
-export default ServerManager;
+export default GuildManager;
+export type { GuildConfigurations };
