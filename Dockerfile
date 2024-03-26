@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .
 
-CMD npm run start:watch
+CMD npm run migrate && npm run start:watch

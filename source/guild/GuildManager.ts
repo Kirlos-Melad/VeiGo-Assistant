@@ -3,10 +3,11 @@ import { getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import path from "path";
 
 import AudioPlayer, { AudioPlayerEventKeys } from "../audio/AudioPlayer.ts";
-import AudioPlayerEvent from "./AudioEvents.ts";
+import AudioPlayerEvent from "../base/AudioEvents.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
 import __dirname from "../utilities/__dirname.ts";
 import Logger from "../utilities/Logger.ts";
+import GuildRepository from "./GuildRepository.ts";
 
 type GuildConfigurations = {
 	communicationChannelId?: string | null;
@@ -15,41 +16,39 @@ type GuildConfigurations = {
 class GuildManager {
 	private mGuild: Guild;
 
-	// private mGuildId: string;
 	// private mAdapterCreator: InternalDiscordGatewayAdapterCreator;
 	private mAudioPlayer: AudioPlayer;
+	private mRepository: GuildRepository;
 
-	private mCommunicationChannel: TextBasedChannel | null;
+	private mCommunicationChannel: TextBasedChannel | undefined;
 
 	constructor(
 		guild: Guild,
 		audioPlayer: AudioPlayer,
-		configurations: GuildConfigurations = {},
+		repository: GuildRepository,
 	) {
 		this.mGuild = guild;
 		this.mAudioPlayer = audioPlayer;
-
-		const { communicationChannelId } = configurations;
-
-		const communicationChannel = communicationChannelId
-			? (guild.channels.cache.get(
-					communicationChannelId,
-			  ) as TextBasedChannel)
-			: null;
-
-		this.mCommunicationChannel = communicationChannel ?? null;
+		this.mRepository = repository;
+		this.mCommunicationChannel = undefined;
 	}
 
 	public get audioPlayer() {
 		return this.mAudioPlayer;
 	}
 
-	public get communicationChannel(): TextBasedChannel | null {
+	public GetCommunicationChannel(): TextBasedChannel | undefined {
 		return this.mCommunicationChannel;
 	}
 
-	public set communicationChannel(channel: TextBasedChannel | null) {
+	public async SetCommunicationChannel(
+		channel: TextBasedChannel | undefined,
+	) {
 		this.mCommunicationChannel = channel;
+		await this.mRepository.Update(
+			{ id: this.mGuild.id },
+			{ communicationChannelId: channel?.id },
+		);
 	}
 
 	private AddEvent<T extends AudioPlayerEventKeys>(
@@ -74,6 +73,18 @@ class GuildManager {
 		}
 	}
 
+	public async LoadCache() {
+		const result = await this.mRepository.Read({ id: this.mGuild.id });
+
+		await this.SetCommunicationChannel(
+			result?.communicationChannelId
+				? (this.mGuild.channels.cache.get(
+						result.communicationChannelId,
+				  ) as TextBasedChannel | undefined)
+				: undefined,
+		);
+	}
+
 	public JoinVoiceChannel(channelId: string) {
 		const connection = joinVoiceChannel({
 			guildId: this.mGuild.id,
@@ -93,6 +104,11 @@ class GuildManager {
 		const connection = getVoiceConnection(this.mGuild.id);
 
 		connection?.destroy();
+	}
+
+	public async Delete() {
+		this.DisconnectFromVoiceChannel();
+		await this.mRepository.Delete({ id: this.mGuild.id });
 	}
 }
 

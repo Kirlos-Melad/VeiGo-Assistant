@@ -1,11 +1,30 @@
-name: "veigo assistant"
+name: "veigo-assistant"
 
 services:
   server:
+    build: .
     container_name: ${SERVER_CONTAINER_NAME}
     ports:
       - "${SERVER_HOST_PORT}:${SERVER_CONTAINER_PORT}"
+    environment:
+      - IS_DEVELOPMENT=true
+      - PORT=${SERVER_CONTAINER_PORT}
+      - DATABASE_CONNECTION=postgres://${DB_USER}:${DB_PASSWORD}@${DB_CONTAINER_NAME}:${DB_CONTAINER_PORT}
+      - DATABASE_DEFAULT_NAME=${DB_DEFAULT_NAME}
+      - DATABASE_NAME=${DB_NAME}
     env_file:
       - .env
     volumes:
       - ${SERVER_VOLUME}:/app/source
+
+  db:
+    container_name: ${DB_CONTAINER_NAME}
+    image: postgres:latest
+    ports:
+      - "${DB_HOST_PORT}:${DB_CONTAINER_PORT}"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DEFAULT_NAME}
+    volumes:
+      - ${DB_VOLUME}:/var/lib/postgresql/data

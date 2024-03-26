@@ -1,20 +1,17 @@
-import {
-	Client,
-	REST,
-	Routes,
-	ClientEvents,
-	TextBasedChannel,
-} from "discord.js";
+import { Client, REST, Routes, ClientEvents, Guild } from "discord.js";
 import path from "path";
 
 import ClientEvent from "../base/ClientEvent.ts";
 import { RetryAsyncCallback } from "../utilities/RetryCallback.ts";
 import Logger from "../utilities/Logger.ts";
-import GuildManager from "../base/GuildManager.ts";
+import GuildManager from "../guild/GuildManager.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
 import __dirname from "../utilities/__dirname.ts";
 import GroupCommand from "../base/GroupCommand.ts";
 import AudioPlayer from "../audio/AudioPlayer.ts";
+import Environments from "../configurations/Environments.ts";
+import DatabaseManager from "../database/DatabaseManager.ts";
+import GuildRepository from "../guild/GuildRepository.ts";
 
 class ClientManager {
 	private static mInstance: ClientManager;
@@ -52,7 +49,11 @@ class ClientManager {
 	): void {
 		this.mDiscordClient.on(
 			event.name,
-			event.listener({ commands: this.mCommands }),
+			event.listener({
+				commands: this.mCommands,
+				CreateGuildManager: this.AddGuildManager.bind(this),
+				DeleteGuildManager: this.DeleteGuildManager.bind(this),
+			}),
 		);
 	}
 
@@ -77,7 +78,7 @@ class ClientManager {
 	}
 
 	public async UpdateCommands() {
-		const rest = new REST().setToken(process.env.CLIENT_TOKEN!);
+		const rest = new REST().setToken(Environments.CLIENT_TOKEN);
 		const commandsMetadata = Object.values(this.mCommands).map(
 			(command) => {
 				return command.metadata;
@@ -87,7 +88,7 @@ class ClientManager {
 		// The put method is used to fully refresh all commands in the guild with the current set
 		await RetryAsyncCallback(3, async () => {
 			await rest.put(
-				Routes.applicationCommands(process.env.APPLICATION_ID!),
+				Routes.applicationCommands(Environments.APPLICATION_ID),
 				{
 					body: commandsMetadata,
 				},
@@ -95,31 +96,38 @@ class ClientManager {
 		});
 	}
 
+	public async AddGuildManager(guild: Guild) {
+		this.mServers[guild.id] = new GuildManager(
+			guild,
+			new AudioPlayer(),
+			new GuildRepository(),
+		);
+
+		await this.mServers[guild.id].LoadEvents();
+		await this.mServers[guild.id].LoadCache();
+	}
+
 	public GetGuildManager(serverId: string) {
 		return this.mServers[serverId];
 	}
 
+	public async DeleteGuildManager(serverId: string) {
+		await this.mServers[serverId].Delete();
+		delete this.mServers[serverId];
+	}
+
 	public async Run() {
 		await RetryAsyncCallback(3, async () => {
-			await this.mDiscordClient.login(process.env.CLIENT_TOKEN);
+			await this.mDiscordClient.login(Environments.CLIENT_TOKEN);
 		});
 
-		for (const guild of this.mDiscordClient.guilds.cache.values()) {
-			const g = { id: guild.id, communicationChannelId: null };
+		const guildsPromiseArray: any[] = [];
 
-			// Create the guild manager
-			this.mServers[guild.id] = new GuildManager(
-				guild,
-				new AudioPlayer(),
-				{
-					communicationChannelId: g.communicationChannelId,
-				},
-			);
+		for (const guild of this.mDiscordClient.guilds.cache.values()) {
+			guildsPromiseArray.push(this.AddGuildManager(guild));
 		}
 
-		await Promise.all(
-			Object.values(this.mServers).map((server) => server.LoadEvents()),
-		);
+		await Promise.all(guildsPromiseArray);
 
 		console.clear();
 		Logger.information(

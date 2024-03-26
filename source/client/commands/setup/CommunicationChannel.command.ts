@@ -37,9 +37,9 @@ class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
 			content: `Setting up communication channel to ${channel}!`,
 		});
 
-		GuildManager!.communicationChannel = channel;
+		await GuildManager!.SetCommunicationChannel(channel);
 
-		GuildManager!.communicationChannel.send(
+		GuildManager!.GetCommunicationChannel()!.send(
 			`Communication channel is set successfully to ${channel}!`,
 		);
 	}

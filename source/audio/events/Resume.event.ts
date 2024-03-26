@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import AudioPlayerEvent from "../../base/AudioEvents.ts";
 import { Audio } from "../AudioPlayer.ts";
 import Queue from "../../utilities/Queue.ts";
-import GuildManager from "../../base/GuildManager.ts";
+import GuildManager from "../../guild/GuildManager.ts";
 
 class Resume extends AudioPlayerEvent<"RESUME_AUDIO"> {
 	constructor() {
@@ -25,7 +25,7 @@ class Resume extends AudioPlayerEvent<"RESUME_AUDIO"> {
 				])
 				.setFooter(this.mEmbedFooterOptions);
 
-			context.communicationChannel?.send({ embeds: [embed] });
+			context.GetCommunicationChannel()?.send({ embeds: [embed] });
 		};
 	}
 }
