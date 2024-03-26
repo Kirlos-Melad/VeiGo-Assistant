@@ -1,8 +1,8 @@
-FROM node:latest
+FROM node:20.11.1
 
 WORKDIR /app
 
-COPY package.json .
+COPY package*.json .
 
 RUN npm install
 

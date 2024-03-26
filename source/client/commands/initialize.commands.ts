@@ -2,14 +2,14 @@ import path from "path";
 import { SlashCommandBuilder } from "discord.js";
 
 import DependencyLoader from "../../utilities/DependencyLoader.ts";
-import __dirname from "../../utilities/__dirname.ts";
+import AbsolutePath from "../../utilities/AbsolutePath.ts";
 import GroupCommand from "../../base/GroupCommand.ts";
 import Logger from "../../utilities/Logger.ts";
 import Command from "../../base/Command.ts";
 
 async function LoadCommands(groupCommand: GroupCommand, directory: string) {
 	const loadedEvents = await DependencyLoader(
-		path.join(__dirname(import.meta.url), directory),
+		path.join(AbsolutePath(import.meta.url), directory),
 		true,
 	);
 

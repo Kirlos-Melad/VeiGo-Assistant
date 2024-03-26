@@ -6,7 +6,7 @@ import { RetryAsyncCallback } from "../utilities/RetryCallback.ts";
 import Logger from "../utilities/Logger.ts";
 import GuildManager from "../guild/GuildManager.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
-import __dirname from "../utilities/__dirname.ts";
+import AbsolutePath from "../utilities/AbsolutePath.ts";
 import GroupCommand from "../base/GroupCommand.ts";
 import AudioPlayer from "../audio/AudioPlayer.ts";
 import Environments from "../configurations/Environments.ts";
@@ -59,7 +59,7 @@ class ClientManager {
 
 	public async LoadEvents() {
 		const loadedEvents = await DependencyLoader(
-			path.join(__dirname(import.meta.url), "events"),
+			path.join(AbsolutePath(import.meta.url), "events"),
 			false,
 		);
 
