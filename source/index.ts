@@ -66,14 +66,13 @@ async function Start() {
 	const clientManager = ClientManager.Create(client);
 
 	Logger.information("Loading commands");
-	const [_, { SetupGroupCommand, DebugGroupCommand, AudioGroupCommand }] =
+	const [_, { SetupGroupCommand, AudioGroupCommand }] =
 		await Promise.all([
 			clientManager.LoadEvents(),
 			import("./client/commands/initialize.commands.ts"),
 		]);
 
 	clientManager.AddGroupCommand(SetupGroupCommand);
-	clientManager.AddGroupCommand(DebugGroupCommand);
 	clientManager.AddGroupCommand(AudioGroupCommand);
 	await clientManager.UpdateCommands();
 
