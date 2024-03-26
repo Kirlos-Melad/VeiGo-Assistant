@@ -5,7 +5,7 @@ import path from "path";
 import AudioPlayer, { AudioPlayerEventKeys } from "../audio/AudioPlayer.ts";
 import AudioPlayerEvent from "../base/AudioEvents.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
-import __dirname from "../utilities/__dirname.ts";
+import AbsolutePath from "../utilities/AbsolutePath.ts";
 import Logger from "../utilities/Logger.ts";
 import GuildRepository from "./GuildRepository.ts";
 
@@ -59,7 +59,7 @@ class GuildManager {
 
 	public async LoadEvents() {
 		const loadedEvents = await DependencyLoader(
-			path.join(__dirname(import.meta.url), "..", "audio", "events"),
+			path.join(AbsolutePath(import.meta.url), "..", "audio", "events"),
 			true,
 		);
 

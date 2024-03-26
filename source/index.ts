@@ -5,7 +5,6 @@ import { format as sqlFormatter } from "sql-formatter";
 import ClientManager from "./client/ClientManager.ts";
 import DatabaseManagerFactory from "./database/DatabaseManager.factory.ts";
 import Logger from "./utilities/Logger.ts";
-import __dirname from "./utilities/__dirname.ts";
 import Environments from "./configurations/Environments.ts";
 
 function DBLogger(event: LogEvent) {

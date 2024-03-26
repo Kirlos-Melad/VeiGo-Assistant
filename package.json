@@ -19,7 +19,6 @@
 		"@types/pg": "^8.11.4",
 		"@types/yt-search": "^2.10.3",
 		"discord.js": "^14.14.1",
-		"ffmpeg": "^0.0.4",
 		"kysely": "^0.27.3",
 		"moment": "^2.30.1",
 		"pg": "^8.11.3",
