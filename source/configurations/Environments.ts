@@ -16,7 +16,6 @@ const environmentVariables = z.object({
 	AUTHOR_NAME: z.string(),
 	AUTHOR_NICKNAME: z.string(),
 	AUTHOR_SIGNATURE: z.string(),
-	BOT_NAME: z.string(),
 });
 
 export default environmentVariables.parse(process.env);

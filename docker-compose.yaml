@@ -17,7 +17,6 @@ services:
       - AUTHOR_NAME=${AUTHOR_NAME}
       - AUTHOR_NICKNAME=${AUTHOR_NICKNAME}
       - AUTHOR_SIGNATURE=${AUTHOR_SIGNATURE}
-      - BOT_NAME=${BOT_NAME}
     env_file:
       - .env
     depends_on:
