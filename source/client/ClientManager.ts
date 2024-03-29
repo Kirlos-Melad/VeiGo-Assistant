@@ -10,7 +10,6 @@ import AbsolutePath from "../utilities/AbsolutePath.ts";
 import GroupCommand from "../base/GroupCommand.ts";
 import AudioPlayer from "../audio/AudioPlayer.ts";
 import Environments from "../configurations/Environments.ts";
-import DatabaseManager from "../database/DatabaseManager.ts";
 import GuildRepository from "../guild/GuildRepository.ts";
 
 class ClientManager {
@@ -42,6 +41,10 @@ class ClientManager {
 		}
 
 		return ClientManager.mInstance;
+	}
+
+	public get name() {
+		return this.mDiscordClient.user?.username;
 	}
 
 	private AddEvent<T extends keyof ClientEvents>(
@@ -131,7 +134,7 @@ class ClientManager {
 
 		console.clear();
 		Logger.information(
-			`${this.mDiscordClient.user?.username} is ready to go!`,
+			`${this.name} is ready to go!`,
 		);
 	}
 }
