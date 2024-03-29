@@ -1,14 +1,15 @@
 name: "veigo-assistant"
 
 services:
-  server:
-    build: .
-    container_name: ${SERVER_CONTAINER_NAME}
+  bot:
+    build:
+      context: ${BOT_CONTEXT_PATH}
+    container_name: ${BOT_CONTAINER_NAME}
     ports:
-      - "${SERVER_HOST_PORT}:${SERVER_CONTAINER_PORT}"
+      - "${BOT_HOST_PORT}:${BOT_CONTAINER_PORT}"
     environment:
       - IS_DEVELOPMENT=true
-      - PORT=${SERVER_CONTAINER_PORT}
+      - PORT=${BOT_CONTAINER_PORT}
       - DATABASE_CONNECTION=postgres://${DB_USER}:${DB_PASSWORD}@${DB_CONTAINER_NAME}:${DB_CONTAINER_PORT}
       - DATABASE_DEFAULT_NAME=${DB_DEFAULT_NAME}
       - DATABASE_NAME=${DB_NAME}
@@ -18,11 +19,28 @@ services:
       - AUTHOR_NICKNAME=${AUTHOR_NICKNAME}
       - AUTHOR_SIGNATURE=${AUTHOR_SIGNATURE}
     env_file:
-      - .env
+      - ${BOT_CONTEXT_PATH}/${BOT_ENV_FILE}
     depends_on:
+      # - ai
       - db
     volumes:
-      - ${SERVER_VOLUME}:/app/source
+      - ${BOT_CONTEXT_PATH}/${BOT_VOLUME}:/app/source
+
+  ai:
+    build:
+      context: ${AI_CONTEXT_PATH}
+    container_name: ${AI_CONTAINER_NAME}
+    ports:
+      - "${AI_HOST_PORT}:${AI_CONTAINER_PORT}"
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+    volumes:
+      - ${AI_CONTEXT_PATH}/${AI_VOLUME}:/app
 
   db:
     container_name: ${DB_CONTAINER_NAME}
