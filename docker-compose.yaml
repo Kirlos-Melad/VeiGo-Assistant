@@ -20,6 +20,8 @@ services:
       - BOT_NAME=${BOT_NAME}
     env_file:
       - .env
+    depends_on:
+      - db
     volumes:
       - ${SERVER_VOLUME}:/app/source
 
