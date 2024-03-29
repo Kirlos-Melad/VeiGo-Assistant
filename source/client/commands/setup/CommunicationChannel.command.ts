@@ -7,6 +7,7 @@ import {
 
 import Command from "../../../base/Command.ts";
 import ClientManager from "../../ClientManager.ts";
+import Environments from "@root/source/configurations/Environments.ts";
 
 class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
 	constructor() {
@@ -39,9 +40,26 @@ class CommunicationChannel extends Command<SlashCommandSubcommandBuilder> {
 
 		await GuildManager!.SetCommunicationChannel(channel);
 
-		GuildManager!.GetCommunicationChannel()!.send(
-			`Communication channel is set successfully to ${channel}!`,
-		);
+		GuildManager!.GetCommunicationChannel()!.send({
+			embeds: [
+				{
+					author: {
+						name: Environments.AUTHOR_NAME,
+						icon_url: Environments.AUTHOR_IMAGE_URL,
+						url: Environments.AUTHOR_PROFILE_URL,
+					},
+					description: `
+					**Behold!** I, ${Environments.AUTHOR_NAME} (AKA ${Environments.AUTHOR_NICKNAME}), your (not-so-glorious) leader... but definitely the mastermind behind this latest creation (or at least the latest thing I haven't broken): ${Environments.BOT_NAME}!
+
+					Now, fear not! ${Environments.BOT_NAME} isn't here to take over the world **(phew!)**  but it's here to make your Discord experience a whole lot smoother. Think of it as a super-powered to-do list on steroids!
+
+					***My beautiful creation has set the communication channel to ${channel}. Prepare to be amazed (or at least mildly impressed)!***
+
+					P.S. While world domination isn't on ${Environments.BOT_NAME}'s current agenda... who knows what the future holds?  (Just kidding... mostly.)
+					`,
+				},
+			],
+		});
 	}
 }
 

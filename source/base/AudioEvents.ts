@@ -3,16 +3,17 @@ import {
 	AudioPlayerEventHandlers,
 	AudioPlayerEventKeys,
 } from "../audio/AudioPlayer.ts";
+import Environments from "../configurations/Environments.ts";
 
 abstract class AudioPlayerEvent<T extends AudioPlayerEventKeys> {
-	protected mName: T;
+	private mName: T;
 	protected mEmbedFooterOptions: EmbedFooterOptions;
 
 	constructor(name: T) {
 		this.mName = name;
 		this.mEmbedFooterOptions = {
-			text: "Developed by Veigo 😎🔥",
-			iconURL: "https://avatars.githubusercontent.com/u/52179817?v=4",
+			text: Environments.AUTHOR_SIGNATURE,
+			iconURL: Environments.AUTHOR_IMAGE_URL,
 		};
 	}
 
