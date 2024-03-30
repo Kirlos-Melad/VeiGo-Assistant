@@ -35,15 +35,13 @@ class AIManager {
 	}
 
 	public Connect() {
-		return new Promise(() => {
-			this.socket.on("connect", new ConnectEvent().listener());
+		this.socket.on("connect", new ConnectEvent().listener());
 
-			this.socket.on("error", new ErrorEvent().listener());
+		this.socket.on("error", new ErrorEvent().listener());
 
-			this.socket.on("disconnect", new DisconnectEvent().listener());
+		this.socket.on("disconnect", new DisconnectEvent().listener());
 
-			this.socket.connect();
-		});
+		this.socket.connect();
 	}
 
 	public async Ask(question: string): Promise<string> {
