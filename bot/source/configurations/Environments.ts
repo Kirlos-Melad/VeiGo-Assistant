@@ -11,6 +11,7 @@ const environmentVariables = z.object({
 	DATABASE_CONNECTION: z.string(),
 	DATABASE_DEFAULT_NAME: z.string(),
 	DATABASE_NAME: z.string(),
+	AI_CONNECTION: z.string(),
 	AUTHOR_PROFILE_URL: z.string(),
 	AUTHOR_IMAGE_URL: z.string(),
 	AUTHOR_NAME: z.string(),

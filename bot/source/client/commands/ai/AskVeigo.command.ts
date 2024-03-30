@@ -23,11 +23,17 @@ class EnableAI extends Command<SlashCommandSubcommandBuilder> {
 	}
 
 	public async execute(interaction: ChatInputCommandInteraction) {
+		if (!ClientManager.instance.AIManger.is_online) {
+			await interaction.editReply({
+				content: "I'm busy at the moment. Try again later.",
+			});
+			return;
+		}
+
 		const question = interaction.options.getString("question")!;
 
 		await interaction.editReply({
-			// content: await ClientManager.instance.AIManger.Ask(question),
-			content: "Veigo ai is not available at the moment.",
+			content: await ClientManager.instance.AIManger.Ask(question),
 		});
 	}
 }

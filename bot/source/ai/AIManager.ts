@@ -1,68 +1,59 @@
 import { io, Socket } from "socket.io-client";
-import Logger from "../utilities/Logger";
+
+import ConnectEvent from "./events/Connect.event";
+import ErrorEvent from "./events/Error.event";
+import DisconnectEvent from "./events/Disconnect.event";
+import AnswerEvent from "./events/Answer.event";
+
+type AIManagerEvents = {
+	CONNECT: [];
+
+	DISCONNECT: [reason: string];
+
+	ERROR: [error: Error];
+
+	ANSWER: [response: string];
+};
+
+type AIManagerEventKeys = keyof AIManagerEvents;
+
+type AIManagerEventHandlers = {
+	[K in AIManagerEventKeys]: (...args: AIManagerEvents[K]) => Promise<void>;
+};
 
 class AIManager {
-    private socket: Socket;
+	private socket: Socket;
 
-    constructor(connection: string) {
-        this.socket = io(connection);
-    }
+	constructor(connection: string) {
+		this.socket = io(connection, {
+			autoConnect: false,
+		});
+	}
 
-    public async Start(){
-        return new Promise((resolve, reject) => {
-            this.socket.on("connect", () => {
-                resolve(this.socket.connected);
-            });
+	public get is_online() {
+		return this.socket.connected;
+	}
 
-            this.socket.on("connect_error", (error: any) => {
-                reject(error);
-            });
+	public Connect() {
+		return new Promise(() => {
+			this.socket.on("connect", new ConnectEvent().listener());
 
-            this.socket.on("connect_timeout", () => {
-                reject("Connection to AI server timed out");
-            });
+			this.socket.on("error", new ErrorEvent().listener());
 
-            this.socket.on("error", (error: any) => {
-                reject(error);
-            });
-            
-            this.socket.on("reconnect", (attempt: any) => {
-                Logger.warning(`Reconnected to AI server on attempt ${attempt}`);
-            });
+			this.socket.on("disconnect", new DisconnectEvent().listener());
 
-            this.socket.on("reconnect_attempt", (attempt: any) => {
-                Logger.warning(`Reconnecting to AI server on attempt ${attempt}`);
-            });
+			this.socket.connect();
+		});
+	}
 
-            this.socket.on("reconnect_error", (error: any) => {
-                reject(error);
-            });
+	public async Ask(question: string): Promise<string> {
+		return new Promise((resolve) => {
+			this.socket.once("answer", new AnswerEvent().listener(resolve));
 
-            this.socket.on("reconnect_failed", () => {
-                reject("Failed to reconnect to AI server");
-            });
-
-            this.socket.on("disconnect", (reason: any) => {
-                reject(reason);
-            });
-
-            if (this.socket.connected) {
-                resolve(true);
-            }
-        });
-        
-    }
-
-    public async Ask(question: string): Promise<string>{
-        return new Promise((resolve, reject) => {
-            this.socket.once("response", (response: string) => {
-                resolve(response);
-            });
-            
-            this.socket.emit("ask", question)
-        });
-    }
+			this.socket.emit("ask", question);
+		});
+	}
 }
 
-
 export default AIManager;
+export type { AIManagerEventKeys, AIManagerEventHandlers };

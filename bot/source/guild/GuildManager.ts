@@ -3,7 +3,7 @@ import { getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import path from "path";
 
 import AudioPlayer, { AudioPlayerEventKeys } from "../audio/AudioPlayer.ts";
-import AudioPlayerEvent from "../base/AudioEvents.ts";
+import AudioPlayerEvent from "../base/AudioEvent.ts";
 import DependencyLoader from "../utilities/DependencyLoader.ts";
 import AbsolutePath from "../utilities/AbsolutePath.ts";
 import Logger from "../utilities/Logger.ts";

@@ -36,7 +36,7 @@ def connect(sid, environ):
 
 @sio.event
 def ask(sid, data):
-    sio.emit('response', respond(data), room=sid)
+    sio.emit('answer', respond(data), room=sid)
 
 @sio.event
 def disconnect(sid):

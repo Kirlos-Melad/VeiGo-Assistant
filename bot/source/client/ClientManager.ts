@@ -19,13 +19,13 @@ class ClientManager {
 	private mDiscordClient: Client;
 	private mCommands: Record<string, GroupCommand>;
 	private mServers: Record<string, GuildManager>;
-	// private mAi : AIManager ;
+	private mAi: AIManager;
 
 	private constructor(discordClient: Client) {
 		this.mDiscordClient = discordClient;
 		this.mCommands = {};
 		this.mServers = {};
-		// this.mAi = new AIManager("https://thirty-impalas-join.loca.lt");
+		this.mAi = new AIManager(Environments.AI_CONNECTION);
 	}
 
 	public static Create(discordClient: Client) {
@@ -50,9 +50,9 @@ class ClientManager {
 		return this.mDiscordClient.user?.username;
 	}
 
-	// public get AIManger(){
-	// 	return this.mAi;
-	// }
+	public get AIManger() {
+		return this.mAi;
+	}
 
 	private AddEvent<T extends keyof ClientEvents>(
 		event: ClientEvent<T>,
@@ -139,10 +139,10 @@ class ClientManager {
 
 		await Promise.all(guildsPromiseArray);
 
+		this.mAi.Connect();
+
 		console.clear();
-		Logger.information(
-			`${this.name} is ready to go!`,
-		);
+		Logger.information(`${this.name} is ready to go!`);
 	}
 }
 

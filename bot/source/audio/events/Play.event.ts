@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 
-import AudioPlayerEvent from "../../base/AudioEvents.ts";
+import AudioPlayerEvent from "../../base/AudioEvent.ts";
 import { Audio } from "../AudioPlayer.ts";
 import Queue from "../../utilities/Queue.ts";
 import GuildManager from "../../guild/GuildManager.ts";
