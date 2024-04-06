@@ -24,6 +24,7 @@ class EnableAI extends Command<SlashCommandSubcommandBuilder> {
 
 	public async execute(interaction: ChatInputCommandInteraction) {
 		if (!ClientManager.instance.AIManger.is_online) {
+			ClientManager.instance.AIManger.Connect();
 			await interaction.editReply({
 				content: "I'm busy at the moment. Try again later.",
 			});

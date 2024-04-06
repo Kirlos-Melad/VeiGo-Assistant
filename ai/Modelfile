@@ -1,0 +1,2 @@
+FROM ./weights/model.gguf
+

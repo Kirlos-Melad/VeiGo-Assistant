@@ -2,3 +2,7 @@ node_modules/
 weights/
 data/
 .env
+*.ipynb
+__pycache__/
+*.pyc
+llama_cpp_model.py

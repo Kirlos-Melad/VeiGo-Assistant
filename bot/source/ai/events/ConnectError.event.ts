@@ -1,9 +1,9 @@
 import AIEvent from "@root/source/base/AIEvents";
 import Logger from "@root/source/utilities/Logger";
 
-class ErrorEvent extends AIEvent<"ERROR"> {
+class ConnectErrorEvent extends AIEvent<"CONNECT_ERROR"> {
 	public constructor() {
-		super("ERROR");
+		super("CONNECT_ERROR");
 	}
 
 	public listener() {
@@ -11,4 +11,4 @@ class ErrorEvent extends AIEvent<"ERROR"> {
 	}
 }
 
-export default ErrorEvent;
+export default ConnectErrorEvent;

@@ -13,7 +13,7 @@ services:
       - DATABASE_CONNECTION=postgres://${DB_USER}:${DB_PASSWORD}@${DB_CONTAINER_NAME}:${DB_CONTAINER_PORT}
       - DATABASE_DEFAULT_NAME=${DB_DEFAULT_NAME}
       - DATABASE_NAME=${DB_NAME}
-      - AI_CONNECTION=${AI_CONTAINER_NAME}:${AI_CONTAINER_PORT}
+      - AI_CONNECTION=http://${AI_CONTAINER_NAME}:${AI_CONTAINER_PORT}
       - AUTHOR_PROFILE_URL=${AUTHOR_PROFILE_URL}
       - AUTHOR_IMAGE_URL=${AUTHOR_IMAGE_URL}
       - AUTHOR_NAME=${AUTHOR_NAME}
@@ -22,7 +22,7 @@ services:
     env_file:
       - ${BOT_CONTEXT_PATH}/${BOT_ENV_FILE}
     depends_on:
-      # - ai
+      - ai
       - db
     volumes:
       - ${BOT_CONTEXT_PATH}/${BOT_VOLUME}:/app/source
@@ -33,6 +33,10 @@ services:
     container_name: ${AI_CONTAINER_NAME}
     ports:
       - "${AI_HOST_PORT}:${AI_CONTAINER_PORT}"
+    environment:
+      - SERVER_PORT=${AI_CONTAINER_PORT}
+      - MODEL_NAME=${MODEL_NAME}
+      - MODEL_URL=${MODEL_URL}
     deploy:
       resources:
         reservations:

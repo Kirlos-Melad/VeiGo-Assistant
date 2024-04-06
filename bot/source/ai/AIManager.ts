@@ -1,14 +1,17 @@
 import { io, Socket } from "socket.io-client";
 
 import ConnectEvent from "./events/Connect.event";
-import ErrorEvent from "./events/Error.event";
 import DisconnectEvent from "./events/Disconnect.event";
+import ErrorEvent from "./events/Error.event";
+import ConnectErrorEvent from "./events/ConnectError.event";
 import AnswerEvent from "./events/Answer.event";
 
 type AIManagerEvents = {
 	CONNECT: [];
 
 	DISCONNECT: [reason: string];
+
+	CONNECT_ERROR: [error: Error];
 
 	ERROR: [error: Error];
 
@@ -28,19 +31,25 @@ class AIManager {
 		this.socket = io(connection, {
 			autoConnect: false,
 		});
+
+		this.ListenToEvents();
 	}
 
 	public get is_online() {
 		return this.socket.connected;
 	}
 
-	public Connect() {
+	private ListenToEvents(){
 		this.socket.on("connect", new ConnectEvent().listener());
-
-		this.socket.on("error", new ErrorEvent().listener());
 
 		this.socket.on("disconnect", new DisconnectEvent().listener());
 
+		this.socket.on("connect_error", new ConnectErrorEvent().listener());
+
+		this.socket.on("error", new ErrorEvent().listener());
+	}
+
+	public Connect() {
 		this.socket.connect();
 	}
 
@@ -54,4 +63,5 @@ class AIManager {
 }
 
 export default AIManager;
-export type { AIManagerEventKeys, AIManagerEventHandlers };
+export type { AIManagerEventHandlers, AIManagerEventKeys };
+
