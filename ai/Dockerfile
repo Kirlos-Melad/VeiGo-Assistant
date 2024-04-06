@@ -37,4 +37,4 @@ RUN chmod +x ./scripts/download_model.sh && \
 
 
 # Run the server
-CMD python3 server.py -im ollama
+CMD python3 server.py

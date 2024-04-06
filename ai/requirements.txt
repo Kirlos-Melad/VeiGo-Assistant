@@ -1,5 +1,4 @@
 eventlet
 python-socketio[client]
 python-dotenv
-llama-cpp-python
 ollama
