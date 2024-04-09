@@ -7,7 +7,7 @@ from typing import Dict
 import ollama
 
 
-class InferenceModel:
+class ChatModel:
     def __init__(self, template: str, system: str, options: Dict, show_logs: bool=False) -> None:
         self.model_name = 'Veigo Assistant'
         self.template = template

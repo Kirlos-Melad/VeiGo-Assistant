@@ -1,9 +1,7 @@
 node_modules/
 weights/
-data/
+storage/
 .env
 *.ipynb
 __pycache__/
 *.pyc
-llama_cpp_model.py
-server_local.py

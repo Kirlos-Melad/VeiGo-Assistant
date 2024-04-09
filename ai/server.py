@@ -4,8 +4,9 @@ import os
 
 import eventlet
 import socketio
-from models.inference import InferenceModel
+from models.chat_model import ChatModel
 from prompts.template import TEMPLATE
+
 
 # Moved the settings loading into a function
 def load_settings():
@@ -32,7 +33,7 @@ system_prompt = load_system_prompt(settings['system_prompt'])
 PORT = int(os.getenv('SERVER_PORT'))
 MODEL_OPTIONS = settings['options']
 
-ai_model = InferenceModel(template=TEMPLATE, system=system_prompt, options=MODEL_OPTIONS, show_logs=True)
+ai_model = ChatModel(template=TEMPLATE, system=system_prompt, options=MODEL_OPTIONS, show_logs=True)
 sio = socketio.Server()
 app = socketio.WSGIApp(sio, static_files={'/': {'content_type': 'text/html', 'filename': 'index.html'}})
 
