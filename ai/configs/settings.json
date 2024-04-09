@@ -1,5 +1,6 @@
 {
   "system_prompt":"small",
+  "show_logs": true,
   "options": {
     "temperature": 0.65,
     "num_predict": 600,

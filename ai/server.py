@@ -33,7 +33,7 @@ system_prompt = load_system_prompt(settings['system_prompt'])
 PORT = int(os.getenv('SERVER_PORT'))
 MODEL_OPTIONS = settings['options']
 
-ai_model = ChatModel(template=TEMPLATE, system=system_prompt, options=MODEL_OPTIONS, show_logs=True)
+ai_model = ChatModel(template=TEMPLATE, system=system_prompt, options=MODEL_OPTIONS, show_logs=settings['show_logs'])
 sio = socketio.Server()
 app = socketio.WSGIApp(sio, static_files={'/': {'content_type': 'text/html', 'filename': 'index.html'}})
 
