@@ -1,18 +1,38 @@
+import argparse
+import json
 import os
+
 import eventlet
 import socketio
-import argparse
-import utils as ut
-from prompts.phi2 import SMALL_SYSTEM_PROMPT, PHI2_TEMPLATE
-from dotenv import load_dotenv
-load_dotenv('./docker-compose.env')
+from models.inference import InferenceModel
+from prompts.template import TEMPLATE
 
+# Moved the settings loading into a function
+def load_settings():
+    with open('./configs/settings.json', 'r') as file:
+        return json.load(file)
+
+# Moved the system prompt loading into a function
+def load_system_prompt(prompt_type):
+    if prompt_type == 'small':
+        from prompts.small_system_prompt import SMALL_SYSTEM_PROMPT
+        return SMALL_SYSTEM_PROMPT
+    elif prompt_type == 'medium':
+        from prompts.medium_system_prompt import MEDIUM_SYSTEM_PROMPT
+        return MEDIUM_SYSTEM_PROMPT
+    elif prompt_type == 'large':
+        from prompts.large_system_prompt import LARGE_SYSTEM_PROMPT
+        return LARGE_SYSTEM_PROMPT
+    else:
+        raise ValueError(f"Invalid system prompt type: {prompt_type}")
+
+settings = load_settings()
+system_prompt = load_system_prompt(settings['system_prompt'])
 
 PORT = int(os.getenv('SERVER_PORT'))
-MODEL_OPTIONS = ut._load_options()['options']
-from models.ollama_model import OllamaModel
-ai_model = OllamaModel(template=PHI2_TEMPLATE, system=SMALL_SYSTEM_PROMPT, options=MODEL_OPTIONS, show_logs=True)
+MODEL_OPTIONS = settings['options']
 
+ai_model = InferenceModel(template=TEMPLATE, system=system_prompt, options=MODEL_OPTIONS, show_logs=True)
 sio = socketio.Server()
 app = socketio.WSGIApp(sio, static_files={'/': {'content_type': 'text/html', 'filename': 'index.html'}})
 

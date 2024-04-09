@@ -3,7 +3,6 @@ FROM nvidia/cuda:12.2.2-devel-ubuntu22.04
 # Set the working directory
 WORKDIR /app
 
-
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y git build-essential \
     python3 python3-pip gcc wget \
@@ -21,20 +20,20 @@ ENV FORCE_CMAKE 1
 ENV CUDA_DOCKER_ARCH=all
 ENV LLAMA_CUBLAS=1
 
-# Install depencencies
-RUN python3 -m pip install --upgrade pip pytest cmake scikit-build setuptools fastapi uvicorn sse-starlette pydantic-settings starlette-context
-
-
-# Install the requirements
+# Install the depencencies
 COPY ./requirements.txt .
 RUN python3 -m pip install -r requirements.txt
 
-
 COPY . .
-# Make the script executable and run it
+
+# Expect Arg variables
+ARG MODEL_URL
+ARG MODEL_PATH
+ARG MODEL_NAME
+
+# Change the permissions of a file to make it executable.
 RUN chmod +x ./scripts/download_model.sh && \
     ./scripts/download_model.sh
-
 
 # Run the server
 CMD python3 server.py

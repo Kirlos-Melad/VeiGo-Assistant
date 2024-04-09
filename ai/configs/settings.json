@@ -1,0 +1,19 @@
+{
+  "system_prompt":"small",
+  "options": {
+    "temperature": 0.65,
+    "num_predict": 600,
+    "stop": [
+      "User:",
+      "Assistant:",
+      "System:",
+      "You:",
+      "</s>",
+      "You are a",
+      "Question:",
+      "Answer:",
+      "A:",
+      "Q:"
+    ]
+  }
+}

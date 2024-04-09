@@ -6,3 +6,4 @@ data/
 __pycache__/
 *.pyc
 llama_cpp_model.py
+server_local.py

@@ -1,12 +1,15 @@
-import ollama
-import sys
+import os
 import subprocess
+import sys
 import time
 from typing import Dict
 
-class OllamaModel:
+import ollama
+
+
+class InferenceModel:
     def __init__(self, template: str, system: str, options: Dict, show_logs: bool=False) -> None:
-        self.model_name = 'model'
+        self.model_name = 'Veigo Assistant'
         self.template = template
         self.system = system
         self.options = options
@@ -20,7 +23,6 @@ class OllamaModel:
         else:
             subprocess.Popen(command, shell=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(5)
-        
 
     def _check_if_created(self):
         names = [model["name"].split(":")[0] for model in ollama.list()['models']]
@@ -29,9 +31,11 @@ class OllamaModel:
         return False
 
     def _create(self):
-        command = f'ollama create {self.model_name} -f Modelfile'
-        subprocess.run(command, shell=True)
-
+        ollama.create(
+            model=self.model_name,
+            modelfile=f"FROM {os.getenv('MODEL_PATH')}/{os.getenv('MODEL_NAME')}",
+        )
+        
     def create_model(self):
         self.serve()
         try:
