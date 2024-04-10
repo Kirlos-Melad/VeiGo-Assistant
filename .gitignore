@@ -1,3 +1,7 @@
 node_modules/
-data/
+weights/
+storage/
 .env
+*.ipynb
+__pycache__/
+*.pyc

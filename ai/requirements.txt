@@ -1,0 +1,4 @@
+eventlet
+python-socketio[client]
+python-dotenv
+ollama
