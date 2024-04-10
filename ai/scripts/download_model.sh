@@ -1,8 +1,4 @@
 #!/bin/bash
-echo $MODEL_URL
-echo $MODEL_PATH
-echo $MODEL_NAME
-
 
 # Check if the weights file exists in the directory
 if [ ! -f "${MODEL_PATH}/${MODEL_NAME}" ]; then
