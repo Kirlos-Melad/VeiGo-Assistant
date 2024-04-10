@@ -1,6 +1,6 @@
 # VeiGo Assistant
 
-VeiGo Assistant is a Discord bot primarily designed for playing music.
+Veigo Assistant is a Discord bot primarily designed for playing music.
 
 ## How to Start
 
