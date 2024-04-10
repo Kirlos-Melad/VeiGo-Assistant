@@ -19,4 +19,4 @@ To get started with Veigo Assistant, follow these steps:
 4. **Run the Docker Compose Command:**
    Once you have Docker Desktop installed and your Discord bot credentials set up, you can launch Veigo Assistant using Docker Compose. Open your terminal, navigate to the project directory, and run the following command:
    ```bash
-   docker-compose --env-file docker-compose.env up
+   docker-compose --env-file docker-compose.env up -d
