@@ -1,4 +1,3 @@
-import argparse
 import json
 import os
 
@@ -48,8 +47,8 @@ def connect(sid, environ):
     print('connect ', sid)
 
 @sio.event
-def ask(sid, data):
-    sio.emit('answer', respond(data), room=sid)
+def ask(sid: str, question: str):
+    return respond(question)
 
 @sio.event
 def disconnect(sid):
