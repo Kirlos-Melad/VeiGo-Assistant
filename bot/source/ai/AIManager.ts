@@ -4,7 +4,6 @@ import ConnectEvent from "./events/Connect.event";
 import DisconnectEvent from "./events/Disconnect.event";
 import ErrorEvent from "./events/Error.event";
 import ConnectErrorEvent from "./events/ConnectError.event";
-import AnswerEvent from "./events/Answer.event";
 
 type AIManagerEvents = {
 	CONNECT: [];
@@ -14,8 +13,6 @@ type AIManagerEvents = {
 	CONNECT_ERROR: [error: Error];
 
 	ERROR: [error: Error];
-
-	ANSWER: [response: string];
 };
 
 type AIManagerEventKeys = keyof AIManagerEvents;
@@ -54,11 +51,7 @@ class AIManager {
 	}
 
 	public async Ask(question: string): Promise<string> {
-		return new Promise((resolve) => {
-			this.socket.once("answer", new AnswerEvent().listener(resolve));
-
-			this.socket.emit("ask", question);
-		});
+		return await this.socket.emitWithAck("ask", question);
 	}
 }
 
