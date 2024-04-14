@@ -11,8 +11,8 @@ services:
       IS_DEVELOPMENT: true
       PORT: ${BOT_CONTAINER_PORT}
       DATABASE_CONNECTION: postgres://${DB_USER}:${DB_PASSWORD}@${DB_CONTAINER_NAME}:${DB_CONTAINER_PORT}
-      DATABASE_DEFAULT_NAME: ${DB_DEFAULT_NAME}
-      DATABASE_NAME: ${DB_NAME}
+      DATABASE_DEFAULT_NAME: ${DEFAULT_DB_NAME}
+      DATABASE_NAME: ${BOT_DB_NAME}
       AI_CONNECTION: http://${AI_CONTAINER_NAME}:${AI_CONTAINER_PORT}
       AUTHOR_PROFILE_URL: ${AUTHOR_PROFILE_URL}
       AUTHOR_IMAGE_URL: ${AUTHOR_IMAGE_URL}
@@ -42,6 +42,13 @@ services:
       MODEL_URL: ${MODEL_URL}
       MODEL_PATH: ${MODEL_PATH}
       MODEL_NAME: ${MODEL_NAME}
+      DEFAULT_DB_NAME: ${DEFAULT_DB_NAME}
+      DB_NAME: ${AI_DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_CONTAINER_NAME}
+      DB_PORT: ${DB_CONTAINER_PORT}
+
     deploy:
       resources:
         reservations:
@@ -60,6 +67,6 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DEFAULT_NAME}
+      POSTGRES_DB: ${DEFAULT_DB_NAME}
     volumes:
       - ${DB_VOLUME}:/var/lib/postgresql/data

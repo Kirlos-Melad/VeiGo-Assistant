@@ -2,3 +2,5 @@ eventlet
 python-socketio[client]
 python-dotenv
 ollama
+psycopg2-binary
+peewee

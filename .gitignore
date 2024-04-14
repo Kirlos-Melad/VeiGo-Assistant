@@ -2,6 +2,5 @@ node_modules/
 weights/
 storage/
 .env
-*.ipynb
 __pycache__/
 *.pyc

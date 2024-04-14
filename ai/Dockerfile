@@ -36,4 +36,4 @@ RUN chmod +x ./scripts/download_model.sh && \
     ./scripts/download_model.sh
 
 # Run the server
-CMD python3 server.py
+CMD python3 main.py
