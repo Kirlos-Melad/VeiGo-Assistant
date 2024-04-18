@@ -8,6 +8,7 @@ import DependencyLoader from "../utilities/DependencyLoader.ts";
 import AbsolutePath from "../utilities/AbsolutePath.ts";
 import Logger from "../utilities/Logger.ts";
 import GuildRepository from "./GuildRepository.ts";
+import { GuildReturn } from "../database/tables/GuildsTable.ts";
 
 type GuildConfigurations = {
 	communicationChannelId?: string | null;
@@ -74,15 +75,28 @@ class GuildManager {
 	}
 
 	public async LoadCache() {
-		const result = await this.mRepository.Read({ id: this.mGuild.id });
+		let result: GuildReturn | undefined;
 
-		await this.SetCommunicationChannel(
-			result?.communicationChannelId
-				? (this.mGuild.channels.cache.get(
-						result.communicationChannelId,
-				  ) as TextBasedChannel | undefined)
-				: undefined,
-		);
+		try {
+			result = await this.mRepository.Read({ id: this.mGuild.id });
+		}
+
+		catch (error) {
+			Logger.error(error);
+			result = await this.mRepository.Create({ id: this.mGuild.id });
+		}
+
+		finally {
+			await this.SetCommunicationChannel(
+				result?.communicationChannelId
+					? (this.mGuild.channels.cache.get(
+							result.communicationChannelId,
+					) as TextBasedChannel | undefined)
+					: undefined,
+			);
+		}
+
+
 	}
 
 	public JoinVoiceChannel(channelId: string) {
