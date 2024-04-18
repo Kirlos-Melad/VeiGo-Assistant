@@ -1,5 +1,5 @@
 from typing import List
-from peewee import Model, PostgresqlDatabase, SQL
+from peewee import Model, PostgresqlDatabase
 
 
 class DataBaseManager:

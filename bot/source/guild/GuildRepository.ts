@@ -21,7 +21,7 @@ class GuildRepository {
 					"deletedAt" = NULL
 				RETURNING *
 				`;
-		return (await DatabaseManager.instance.ExecuteQuery(query)).rows[0];
+		return await DatabaseManager.instance.ExecuteQuery(query);
 	}
 
 	public async Read(filter: GuildRead) {

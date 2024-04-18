@@ -19,7 +19,7 @@ class ServerManger:
 
     def on_ask(self, sid: str, question: str):
         #return dict{result, error} #* one of them has to be Null and the other has to be an object
-        response =  self.chat_model.infer(question, limit=1000)
+        response =  self.chat_model.infer(question, limit=2000)
         if response.strip() == '':
             response = 'I am sorry, I could not understand that.'
         return response

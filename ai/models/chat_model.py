@@ -16,7 +16,7 @@ class ChatModel:
         self.create_model()
 
     def serve(self):
-        command = f'ollama serve'
+        command = 'ollama serve'
         if self.show_logs:
             subprocess.Popen(command, shell=True)
         else:
@@ -34,7 +34,7 @@ class ChatModel:
             model=self.model_name,
             modelfile=f"FROM {os.getenv('MODEL_PATH')}/{os.getenv('MODEL_NAME')}",
         )
-        
+
     def create_model(self):
         self.serve()
         try:
@@ -43,20 +43,22 @@ class ChatModel:
                 return
             self._create()
             print(f'Model {self.model_name} created successfully')
-        except :
+        except Exception:
             self._create()
             print(f'Model {self.model_name} created successfully')
 
     def infer(self, prompt: str, limit:int=None) -> str:
-        generated_output = ollama.generate(
-                model=self.model_name,
-                prompt=prompt,
-                template=self.template,
-                system=self.system,
-                options=self.options,
-            )
-        
+        try :
+            generated_output = ollama.generate(
+                    model=self.model_name,
+                    prompt=prompt,
+                    template=self.template,
+                    system=self.system,
+                    options=self.options,
+                )
+        except Exception:
+            return "I am sorry, I am not able to generate a response for that question, please try again."
+
         if limit:
             return generated_output['response'][:limit]
         return generated_output['response']
-    
